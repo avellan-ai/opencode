@@ -948,9 +948,27 @@ export namespace Session {
 
   export async function revert(input: { sessionID: string; messageID: string; partID: string }) {
     const all = await messages(input.sessionID)
-    const message = await getMessage(input.sessionID, input.messageID)
-    const parts = await getParts(input.sessionID, input.messageID)
-    const index = parts.findIndex((x) => x.id === input.partID)
+    let snapshot: MessageV2.SnapshotPart | undefined
+    for (let i = 0; i < all.length; i++) {
+      const msg = all[i]
+
+      for (const part of msg.parts) {
+        if (part.id > input.partID) {
+          // delete part
+          continue
+        }
+        if (part.type === "snapshot") {
+          snapshot = part
+        }
+        if (part.id === input.partID && snapshot) {
+          await Snapshot.restore(input.sessionID, snapshot.snapshot)
+        }
+      }
+
+      if (msg.info.id > input.messageID) {
+        // delete message
+      }
+    }
 
     // TODO
     /*
