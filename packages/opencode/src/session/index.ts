@@ -61,13 +61,6 @@ export namespace Session {
         created: z.number(),
         updated: z.number(),
       }),
-      revert: z
-        .object({
-          messageID: z.string(),
-          part: z.number(),
-          snapshot: z.string().optional(),
-        })
-        .optional(),
     })
     .openapi({
       ref: "Session",
@@ -359,33 +352,6 @@ export namespace Session {
     const model = await Provider.getModel(input.providerID, input.modelID)
     let msgs = await messages(input.sessionID)
     const session = await get(input.sessionID)
-
-    if (session.revert) {
-      const trimmed = []
-      for (const msg of msgs) {
-        if (
-          msg.info.id > session.revert.messageID ||
-          (msg.info.id === session.revert.messageID && session.revert.part === 0)
-        ) {
-          await Storage.remove("session/message/" + input.sessionID + "/" + msg.info.id)
-          await Bus.publish(MessageV2.Event.Removed, {
-            sessionID: input.sessionID,
-            messageID: msg.info.id,
-          })
-          continue
-        }
-
-        if (msg.info.id === session.revert.messageID) {
-          if (session.revert.part === 0) break
-          msg.parts = msg.parts.slice(0, session.revert.part)
-        }
-        trimmed.push(msg)
-      }
-      msgs = trimmed
-      await update(input.sessionID, (draft) => {
-        draft.revert = undefined
-      })
-    }
 
     const previous = msgs.filter((x) => x.info.role === "assistant").at(-1)?.info as MessageV2.Assistant
     const outputLimit = Math.min(model.info.limit.output, OUTPUT_TOKEN_MAX) || OUTPUT_TOKEN_MAX
@@ -981,48 +947,7 @@ export namespace Session {
     }
   }
 
-  export async function revert(_input: { sessionID: string; messageID: string; part: number }) {
-    // TODO
-    /*
-    const message = await getMessage(input.sessionID, input.messageID)
-    if (!message) return
-    const part = message.parts[input.part]
-    if (!part) return
-    const session = await get(input.sessionID)
-    const snapshot =
-      session.revert?.snapshot ?? (await Snapshot.create(input.sessionID))
-    const old = (() => {
-      if (message.role === "assistant") {
-        const lastTool = message.parts.findLast(
-          (part, index) =>
-            part.type === "tool-invocation" && index < input.part,
-        )
-        if (lastTool && lastTool.type === "tool-invocation")
-          return message.metadata.tool[lastTool.toolInvocation.toolCallId]
-            .snapshot
-      }
-      return message.metadata.snapshot
-    })()
-    if (old) await Snapshot.restore(input.sessionID, old)
-    await update(input.sessionID, (draft) => {
-      draft.revert = {
-        messageID: input.messageID,
-        part: input.part,
-        snapshot,
-      }
-    })
-    */
-  }
-
-  export async function unrevert(sessionID: string) {
-    const session = await get(sessionID)
-    if (!session) return
-    if (!session.revert) return
-    if (session.revert.snapshot) await Snapshot.restore(sessionID, session.revert.snapshot)
-    update(sessionID, (draft) => {
-      draft.revert = undefined
-    })
-  }
+  export async function revert(_input: { sessionID: string; messageID: string; part: number }) {}
 
   export async function summarize(input: { sessionID: string; providerID: string; modelID: string }) {
     using abort = lock(input.sessionID)

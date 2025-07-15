@@ -60,7 +60,8 @@ export namespace Snapshot {
   export async function diff(sessionID: string, commit: string) {
     const git = gitdir(sessionID)
     const result = await $`git --git-dir=${git} diff -R ${commit}`.quiet().cwd(App.info().path.root)
-    return result.stdout.toString("utf8")
+    const text = result.stdout.toString("utf8")
+    return text
   }
 
   function gitdir(sessionID: string) {
