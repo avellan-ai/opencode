@@ -819,7 +819,7 @@ export namespace Session {
             })
             switch (value.type) {
               case "start":
-                const snapshot = await Snapshot.create(assistantMsg.sessionID, true)
+                const snapshot = await Snapshot.create()
                 if (snapshot)
                   await updatePart({
                     id: Identifier.ascending("part"),
@@ -883,7 +883,7 @@ export namespace Session {
                     },
                   })
                   delete toolCalls[value.toolCallId]
-                  const snapshot = await Snapshot.create(assistantMsg.sessionID)
+                  const snapshot = await Snapshot.create()
                   if (snapshot)
                     await updatePart({
                       id: Identifier.ascending("part"),
@@ -912,7 +912,7 @@ export namespace Session {
                     },
                   })
                   delete toolCalls[value.toolCallId]
-                  const snapshot = await Snapshot.create(assistantMsg.sessionID)
+                  const snapshot = await Snapshot.create()
                   if (snapshot)
                     await updatePart({
                       id: Identifier.ascending("part"),
@@ -1075,9 +1075,9 @@ export namespace Session {
         if ((msg.info.id === input.messageID && !input.partID) || part.id === input.partID) {
           // if no useful parts left in message, same as reverting whole message
           const partID = remaining.some((item) => ["text", "tool"].includes(item.type)) ? input.partID : undefined
-          const snapshot = session.revert?.snapshot ?? (await Snapshot.create(input.sessionID, true))
+          const snapshot = session.revert?.snapshot ?? (await Snapshot.create(true))
           log.info("revert snapshot", { snapshot })
-          if (lastSnapshot) await Snapshot.restore(input.sessionID, lastSnapshot.snapshot)
+          if (lastSnapshot) await Snapshot.restore(lastSnapshot.snapshot)
           const next = await update(input.sessionID, (draft) => {
             draft.revert = {
               // if not part id jump to the last user message
@@ -1097,7 +1097,7 @@ export namespace Session {
     log.info("unreverting", input)
     const session = await get(input.sessionID)
     if (!session.revert) return session
-    if (session.revert.snapshot) await Snapshot.restore(input.sessionID, session.revert.snapshot)
+    if (session.revert.snapshot) await Snapshot.restore(session.revert.snapshot)
     const next = await update(input.sessionID, (draft) => {
       draft.revert = undefined
     })
