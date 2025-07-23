@@ -45,6 +45,7 @@ type EditorComponent interface {
 	SetInterruptKeyInDebounce(inDebounce bool)
 	SetExitKeyInDebounce(inDebounce bool)
 	RestoreFromHistory(index int)
+	AppendPrompt(prompt app.Prompt)
 }
 
 type editorComponent struct {
@@ -630,21 +631,15 @@ func NewEditorComponent(app *app.App) EditorComponent {
 	return m
 }
 
-// RestoreFromHistory restores a message from history at the given index
-func (m *editorComponent) RestoreFromHistory(index int) {
-	if index < 0 || index >= len(m.app.State.MessageHistory) {
-		return
-	}
-
-	entry := m.app.State.MessageHistory[index]
-
-	m.textarea.Reset()
-	m.textarea.SetValue(entry.Text)
+func (m *editorComponent) AppendPrompt(prompt app.Prompt) {
+	length := m.Length()
+	m.textarea.MoveToEnd()
+	m.textarea.InsertRunesFromUserInput([]rune(prompt.Text))
 
 	// Sort attachments by start index in reverse order (process from end to beginning)
 	// This prevents index shifting issues
-	attachmentsCopy := make([]*attachment.Attachment, len(entry.Attachments))
-	copy(attachmentsCopy, entry.Attachments)
+	attachmentsCopy := make([]*attachment.Attachment, len(prompt.Attachments))
+	copy(attachmentsCopy, prompt.Attachments)
 
 	for i := 0; i < len(attachmentsCopy)-1; i++ {
 		for j := i + 1; j < len(attachmentsCopy); j++ {
@@ -655,10 +650,25 @@ func (m *editorComponent) RestoreFromHistory(index int) {
 	}
 
 	for _, att := range attachmentsCopy {
-		m.textarea.SetCursorColumn(att.StartIndex)
-		m.textarea.ReplaceRange(att.StartIndex, att.EndIndex, "")
+		m.textarea.SetCursorColumn(length + att.StartIndex)
+		m.textarea.ReplaceRange(length+att.StartIndex, length+att.EndIndex, "")
 		m.textarea.InsertAttachment(att)
 	}
+}
+
+func (m *editorComponent) RestoreFromPrompt(prompt app.Prompt) {
+	m.textarea.Reset()
+	m.textarea.MoveToBegin()
+	m.AppendPrompt(prompt)
+}
+
+// RestoreFromHistory restores a message from history at the given index
+func (m *editorComponent) RestoreFromHistory(index int) {
+	if index < 0 || index >= len(m.app.State.MessageHistory) {
+		return
+	}
+	entry := m.app.State.MessageHistory[index]
+	m.RestoreFromPrompt(entry)
 }
 
 func getMediaTypeFromExtension(ext string) string {

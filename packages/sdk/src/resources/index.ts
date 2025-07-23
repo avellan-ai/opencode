@@ -50,6 +50,7 @@ export {
   type FileSource,
   type Message,
   type Part,
+  type PartsInput,
   type Session,
   type SnapshotPart,
   type StepFinishPart,

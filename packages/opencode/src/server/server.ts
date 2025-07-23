@@ -720,12 +720,7 @@ export namespace Server {
             },
           },
         }),
-        zValidator(
-          "json",
-          z.object({
-            text: z.string(),
-          }),
-        ),
+        zValidator("json", Session.ChatInput.pick({ parts: true })),
         async (c) => c.json(await callTui(c)),
       )
       .post(

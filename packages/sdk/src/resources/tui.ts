@@ -1,6 +1,7 @@
 // File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
 import { APIResource } from '../core/resource';
+import * as SessionAPI from './session';
 import { APIPromise } from '../core/api-promise';
 import { RequestOptions } from '../internal/request-options';
 
@@ -25,7 +26,7 @@ export type TuiAppendPromptResponse = boolean;
 export type TuiOpenHelpResponse = boolean;
 
 export interface TuiAppendPromptParams {
-  text: string;
+  parts: SessionAPI.PartsInput;
 }
 
 export declare namespace Tui {

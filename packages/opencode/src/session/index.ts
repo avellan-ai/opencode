@@ -330,14 +330,8 @@ export namespace Session {
     return part
   }
 
-  export const ChatInput = z.object({
-    sessionID: Identifier.schema("session"),
-    messageID: Identifier.schema("message").optional(),
-    providerID: z.string(),
-    modelID: z.string(),
-    mode: z.string().optional(),
-    tools: z.record(z.boolean()).optional(),
-    parts: z.array(
+  export const PartsInput = z
+    .array(
       z.discriminatedUnion("type", [
         MessageV2.TextPart.omit({
           messageID: true,
@@ -360,7 +354,19 @@ export namespace Session {
             ref: "FilePartInput",
           }),
       ]),
-    ),
+    )
+    .openapi({
+      ref: "PartsInput",
+    })
+
+  export const ChatInput = z.object({
+    sessionID: Identifier.schema("session"),
+    messageID: Identifier.schema("message").optional(),
+    providerID: z.string(),
+    modelID: z.string(),
+    mode: z.string().optional(),
+    tools: z.record(z.boolean()).optional(),
+    parts: PartsInput,
   })
   export type ChatInput = z.infer<typeof ChatInput>
 

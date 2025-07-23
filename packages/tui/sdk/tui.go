@@ -48,7 +48,7 @@ func (r *TuiService) OpenHelp(ctx context.Context, opts ...option.RequestOption)
 }
 
 type TuiAppendPromptParams struct {
-	Text param.Field[string] `json:"text,required"`
+	Parts param.Field[PartsInputParam] `json:"parts,required"`
 }
 
 func (r TuiAppendPromptParams) MarshalJSON() (data []byte, err error) {

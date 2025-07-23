@@ -496,7 +496,7 @@ func (r FilePartInputParam) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
-func (r FilePartInputParam) implementsSessionChatParamsPartUnion() {}
+func (r FilePartInputParam) implementsPartsInputItemUnionParam() {}
 
 type FilePartInputType string
 
@@ -927,6 +927,46 @@ const (
 func (r PartType) IsKnown() bool {
 	switch r {
 	case PartTypeText, PartTypeFile, PartTypeTool, PartTypeStepStart, PartTypeStepFinish, PartTypeSnapshot:
+		return true
+	}
+	return false
+}
+
+type PartsInputParam []PartsInputItemUnionParam
+
+type PartsInputItemParam struct {
+	Type      param.Field[PartsInputItemType]       `json:"type,required"`
+	ID        param.Field[string]                   `json:"id"`
+	Filename  param.Field[string]                   `json:"filename"`
+	Mime      param.Field[string]                   `json:"mime"`
+	Source    param.Field[FilePartSourceUnionParam] `json:"source"`
+	Synthetic param.Field[bool]                     `json:"synthetic"`
+	Text      param.Field[string]                   `json:"text"`
+	Time      param.Field[interface{}]              `json:"time"`
+	URL       param.Field[string]                   `json:"url"`
+}
+
+func (r PartsInputItemParam) MarshalJSON() (data []byte, err error) {
+	return apijson.MarshalRoot(r)
+}
+
+func (r PartsInputItemParam) implementsPartsInputItemUnionParam() {}
+
+// Satisfied by [TextPartInputParam], [FilePartInputParam], [PartsInputItemParam].
+type PartsInputItemUnionParam interface {
+	implementsPartsInputItemUnionParam()
+}
+
+type PartsInputItemType string
+
+const (
+	PartsInputItemTypeText PartsInputItemType = "text"
+	PartsInputItemTypeFile PartsInputItemType = "file"
+)
+
+func (r PartsInputItemType) IsKnown() bool {
+	switch r {
+	case PartsInputItemTypeText, PartsInputItemTypeFile:
 		return true
 	}
 	return false
@@ -1451,7 +1491,7 @@ func (r TextPartInputParam) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
 }
 
-func (r TextPartInputParam) implementsSessionChatParamsPartUnion() {}
+func (r TextPartInputParam) implementsPartsInputItemUnionParam() {}
 
 type TextPartInputType string
 
@@ -1949,55 +1989,16 @@ func (r sessionMessagesResponseJSON) RawJSON() string {
 }
 
 type SessionChatParams struct {
-	ModelID    param.Field[string]                       `json:"modelID,required"`
-	Parts      param.Field[[]SessionChatParamsPartUnion] `json:"parts,required"`
-	ProviderID param.Field[string]                       `json:"providerID,required"`
-	MessageID  param.Field[string]                       `json:"messageID"`
-	Mode       param.Field[string]                       `json:"mode"`
-	Tools      param.Field[map[string]bool]              `json:"tools"`
+	ModelID    param.Field[string]          `json:"modelID,required"`
+	Parts      param.Field[PartsInputParam] `json:"parts,required"`
+	ProviderID param.Field[string]          `json:"providerID,required"`
+	MessageID  param.Field[string]          `json:"messageID"`
+	Mode       param.Field[string]          `json:"mode"`
+	Tools      param.Field[map[string]bool] `json:"tools"`
 }
 
 func (r SessionChatParams) MarshalJSON() (data []byte, err error) {
 	return apijson.MarshalRoot(r)
-}
-
-type SessionChatParamsPart struct {
-	Type      param.Field[SessionChatParamsPartsType] `json:"type,required"`
-	ID        param.Field[string]                     `json:"id"`
-	Filename  param.Field[string]                     `json:"filename"`
-	Mime      param.Field[string]                     `json:"mime"`
-	Source    param.Field[FilePartSourceUnionParam]   `json:"source"`
-	Synthetic param.Field[bool]                       `json:"synthetic"`
-	Text      param.Field[string]                     `json:"text"`
-	Time      param.Field[interface{}]                `json:"time"`
-	URL       param.Field[string]                     `json:"url"`
-}
-
-func (r SessionChatParamsPart) MarshalJSON() (data []byte, err error) {
-	return apijson.MarshalRoot(r)
-}
-
-func (r SessionChatParamsPart) implementsSessionChatParamsPartUnion() {}
-
-// Satisfied by [TextPartInputParam], [FilePartInputParam],
-// [SessionChatParamsPart].
-type SessionChatParamsPartUnion interface {
-	implementsSessionChatParamsPartUnion()
-}
-
-type SessionChatParamsPartsType string
-
-const (
-	SessionChatParamsPartsTypeText SessionChatParamsPartsType = "text"
-	SessionChatParamsPartsTypeFile SessionChatParamsPartsType = "file"
-)
-
-func (r SessionChatParamsPartsType) IsKnown() bool {
-	switch r {
-	case SessionChatParamsPartsTypeText, SessionChatParamsPartsTypeFile:
-		return true
-	}
-	return false
 }
 
 type SessionInitParams struct {

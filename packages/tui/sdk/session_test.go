@@ -118,7 +118,7 @@ func TestSessionChatWithOptionalParams(t *testing.T) {
 		"id",
 		opencode.SessionChatParams{
 			ModelID: opencode.F("modelID"),
-			Parts: opencode.F([]opencode.SessionChatParamsPartUnion{opencode.TextPartInputParam{
+			Parts: opencode.F(opencode.PartsInputParam{opencode.TextPartInputParam{
 				Text:      opencode.F("text"),
 				Type:      opencode.F(opencode.TextPartInputTypeText),
 				ID:        opencode.F("id"),

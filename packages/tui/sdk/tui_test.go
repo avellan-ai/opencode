@@ -26,7 +26,16 @@ func TestTuiAppendPrompt(t *testing.T) {
 		option.WithBaseURL(baseURL),
 	)
 	_, err := client.Tui.AppendPrompt(context.TODO(), opencode.TuiAppendPromptParams{
-		Text: opencode.F("text"),
+		Parts: opencode.F(opencode.PartsInputParam{opencode.TextPartInputParam{
+			Text:      opencode.F("text"),
+			Type:      opencode.F(opencode.TextPartInputTypeText),
+			ID:        opencode.F("id"),
+			Synthetic: opencode.F(true),
+			Time: opencode.F(opencode.TextPartInputTimeParam{
+				Start: opencode.F(0.000000),
+				End:   opencode.F(0.000000),
+			}),
+		}}),
 	})
 	if err != nil {
 		var apierr *opencode.Error

@@ -1,8 +1,10 @@
 package app
 
 import (
+	"strings"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/sst/opencode-sdk-go"
 	"github.com/sst/opencode/internal/attachment"
 	"github.com/sst/opencode/internal/id"
@@ -109,8 +111,8 @@ func (p Prompt) ToMessage(
 	}
 }
 
-func (m Message) ToSessionChatParams() []opencode.SessionChatParamsPartUnion {
-	parts := []opencode.SessionChatParamsPartUnion{}
+func (m Message) ToSessionChatParams() opencode.PartsInputParam {
+	parts := []opencode.PartsInputItemUnionParam{}
 	for _, part := range m.Parts {
 		switch p := part.(type) {
 		case opencode.TextPart:
@@ -173,8 +175,8 @@ func (m Message) ToSessionChatParams() []opencode.SessionChatParamsPartUnion {
 	return parts
 }
 
-func (p Prompt) ToSessionChatParams() []opencode.SessionChatParamsPartUnion {
-	parts := []opencode.SessionChatParamsPartUnion{
+func (p Prompt) ToSessionChatParams() opencode.PartsInputParam {
+	parts := []opencode.PartsInputItemUnionParam{
 		opencode.TextPartInputParam{
 			Type: opencode.F(opencode.TextPartInputTypeText),
 			Text: opencode.F(p.Text),
@@ -232,4 +234,63 @@ func (p Prompt) ToSessionChatParams() []opencode.SessionChatParamsPartUnion {
 		parts = append(parts, filePart)
 	}
 	return parts
+}
+
+func NewPromptFromParts(parts opencode.PartsInputParam) Prompt {
+	texts := []string{}
+	attachments := []*attachment.Attachment{}
+	for _, part := range parts {
+		switch p := part.(type) {
+		case opencode.TextPartInputParam:
+			texts = append(texts, p.Text.Value)
+		case opencode.FilePartInputParam:
+			switch source := p.Source.Value.(type) {
+			case opencode.FileSourceParam:
+				display := source.Text.Value.Value.Value
+				texts = append(texts, display)
+				attachments = append(attachments, &attachment.Attachment{
+					ID:         uuid.NewString(),
+					Type:       "file",
+					Display:    display,
+					URL:        p.URL.Value,
+					Filename:   p.Filename.Value,
+					MediaType:  p.Mime.Value,
+					StartIndex: int(source.Text.Value.Start.Value),
+					EndIndex:   int(source.Text.Value.End.Value),
+					Source:     attachment.FileSource{Path: source.Path.Value, Mime: p.Mime.Value},
+				})
+			case opencode.SymbolSourceParam:
+				display := source.Text.Value.Value.Value
+				texts = append(texts, display)
+				attachments = append(attachments, &attachment.Attachment{
+					ID:         uuid.NewString(),
+					Type:       "symbol",
+					Display:    display,
+					URL:        p.URL.Value,
+					Filename:   p.Filename.Value,
+					MediaType:  p.Mime.Value,
+					StartIndex: int(source.Text.Value.Start.Value),
+					EndIndex:   int(source.Text.Value.End.Value),
+					Source: attachment.SymbolSource{
+						Path: source.Path.Value,
+						Name: source.Name.Value,
+						Kind: int(source.Kind.Value),
+						Range: attachment.SymbolRange{
+							Start: attachment.Position{
+								Line: int(source.Range.Value.Start.Value.Line.Value),
+								Char: int(source.Range.Value.Start.Value.Character.Value),
+							},
+							End: attachment.Position{
+								Line: int(source.Range.Value.End.Value.Line.Value),
+								Char: int(source.Range.Value.End.Value.Character.Value),
+							},
+						}},
+				})
+			}
+		}
+	}
+	return Prompt{
+		Text:        strings.Join(texts, " "),
+		Attachments: attachments,
+	}
 }

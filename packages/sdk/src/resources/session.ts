@@ -205,6 +205,8 @@ export type Message = UserMessage | AssistantMessage;
 
 export type Part = TextPart | FilePart | ToolPart | StepStartPart | StepFinishPart | SnapshotPart;
 
+export type PartsInput = Array<TextPartInput | FilePartInput>;
+
 export interface Session {
   id: string;
 
@@ -494,7 +496,7 @@ export type SessionSummarizeResponse = boolean;
 export interface SessionChatParams {
   modelID: string;
 
-  parts: Array<TextPartInput | FilePartInput>;
+  parts: PartsInput;
 
   providerID: string;
 
@@ -529,6 +531,7 @@ export declare namespace SessionResource {
     type FileSource as FileSource,
     type Message as Message,
     type Part as Part,
+    type PartsInput as PartsInput,
     type Session as Session,
     type SnapshotPart as SnapshotPart,
     type StepFinishPart as StepFinishPart,

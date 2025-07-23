@@ -511,15 +511,11 @@ func (a Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			a.modal = helpDialog
 		case "/tui/append-prompt":
 			var body struct {
-				Text string `json:"text"`
+				Parts opencode.PartsInputParam `json:"parts"`
 			}
 			json.Unmarshal((msg.Body), &body)
-			existing := a.editor.Value()
-			text := body.Text
-			if existing != "" && !strings.HasSuffix(existing, " ") {
-				text = " " + text
-			}
-			a.editor.SetValueWithAttachments(existing + text + " ")
+			prompt := app.NewPromptFromParts(body.Parts)
+			a.editor.AppendPrompt(prompt)
 		default:
 			break
 		}

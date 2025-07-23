@@ -92,6 +92,7 @@ Types:
 - <code><a href="./src/resources/session.ts">FileSource</a></code>
 - <code><a href="./src/resources/session.ts">Message</a></code>
 - <code><a href="./src/resources/session.ts">Part</a></code>
+- <code><a href="./src/resources/session.ts">PartsInput</a></code>
 - <code><a href="./src/resources/session.ts">Session</a></code>
 - <code><a href="./src/resources/session.ts">SnapshotPart</a></code>
 - <code><a href="./src/resources/session.ts">StepFinishPart</a></code>

@@ -90,6 +90,7 @@ resources:
       session: Session
       message: Message
       part: Part
+      partsInput: PartsInput
       textPart: TextPart
       textPartInput: TextPartInput
       filePart: FilePart

@@ -77,7 +77,7 @@ async function appendPrompt(port: number, text: string) {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ text }),
+    body: JSON.stringify({ parts: [{ type: "text", text }] }),
   })
 }
 
