@@ -83,7 +83,7 @@ export namespace Config {
         ...md.data,
         prompt: md.content.trim(),
       }
-      const parsed = Mode.safeParse(config)
+      const parsed = Agent.safeParse(config)
       if (parsed.success) {
         result.mode = mergeDeep(result.mode, {
           [config.name]: parsed.data,
@@ -149,7 +149,7 @@ export namespace Config {
   export const Mcp = z.discriminatedUnion("type", [McpLocal, McpRemote])
   export type Mcp = z.infer<typeof Mcp>
 
-  export const Mode = z
+  export const Agent = z
     .object({
       model: z.string().optional(),
       temperature: z.number().optional(),
@@ -157,24 +157,20 @@ export namespace Config {
       prompt: z.string().optional(),
       tools: z.record(z.string(), z.boolean()).optional(),
       disable: z.boolean().optional(),
+      description: z.string().optional().describe("Description of when to use the agent"),
+      mode: z.union([z.literal("subagent"), z.literal("primary"), z.literal("all")]).optional(),
     })
     .openapi({
-      ref: "ModeConfig",
+      ref: "AgentConfig",
     })
-  export type Mode = z.infer<typeof Mode>
-
-  export const Agent = Mode.extend({
-    description: z.string(),
-  }).openapi({
-    ref: "AgentConfig",
-  })
+  export type Agent = z.infer<typeof Agent>
 
   export const Keybinds = z
     .object({
       leader: z.string().optional().default("ctrl+x").describe("Leader key for keybind combinations"),
       app_help: z.string().optional().default("<leader>h").describe("Show help dialog"),
-      switch_mode: z.string().optional().default("tab").describe("Next mode"),
-      switch_mode_reverse: z.string().optional().default("shift+tab").describe("Previous Mode"),
+      switch_agent: z.string().optional().default("tab").describe("Next mode"),
+      switch_agent_reverse: z.string().optional().default("shift+tab").describe("Previous Mode"),
       editor_open: z.string().optional().default("<leader>e").describe("Open external editor"),
       session_export: z.string().optional().default("<leader>x").describe("Export session to editor"),
       session_new: z.string().optional().default("<leader>n").describe("Create a new session"),
@@ -257,19 +253,21 @@ export namespace Config {
         .describe("Custom username to display in conversations instead of system username"),
       mode: z
         .object({
-          build: Mode.optional(),
-          plan: Mode.optional(),
+          build: Agent.optional(),
+          plan: Agent.optional(),
         })
-        .catchall(Mode)
+        .catchall(Agent)
         .optional()
-        .describe("Modes configuration, see https://opencode.ai/docs/modes"),
+        .describe("@deprecated Use `agent` field instead."),
       agent: z
         .object({
+          plan: Agent.optional(),
+          build: Agent.optional(),
           general: Agent.optional(),
         })
         .catchall(Agent)
         .optional()
-        .describe("Modes configuration, see https://opencode.ai/docs/modes"),
+        .describe("Agent configuration, see https://opencode.ai/docs/agent"),
       provider: z
         .record(
           ModelsDev.Provider.partial()

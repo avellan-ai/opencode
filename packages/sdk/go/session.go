@@ -2080,8 +2080,8 @@ type SessionChatParams struct {
 	ModelID    param.Field[string]                       `json:"modelID,required"`
 	Parts      param.Field[[]SessionChatParamsPartUnion] `json:"parts,required"`
 	ProviderID param.Field[string]                       `json:"providerID,required"`
+	Agent      param.Field[string]                       `json:"agent"`
 	MessageID  param.Field[string]                       `json:"messageID"`
-	Mode       param.Field[string]                       `json:"mode"`
 	System     param.Field[string]                       `json:"system"`
 	Tools      param.Field[map[string]bool]              `json:"tools"`
 }
