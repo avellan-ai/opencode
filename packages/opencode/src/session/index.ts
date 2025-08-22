@@ -48,6 +48,7 @@ import { Wildcard } from "../util/wildcard"
 import { ulid } from "ulid"
 import { defer } from "../util/defer"
 import { Command } from "../command"
+import { $ } from "bun"
 
 export namespace Session {
   const log = Log.create({ service: "session" })
@@ -484,7 +485,6 @@ export namespace Session {
               }
               break
             case "file:":
-              log.info("file", { url })
               // have to normalize, symbol search returns absolute paths
               // Decode the pathname since URL constructor doesn't automatically decode it
               const filePath = decodeURIComponent(url.pathname)
@@ -525,7 +525,6 @@ export namespace Session {
                   }
                 }
                 const args = { filePath, offset, limit }
-                log.info("file", args)
                 const result = await ReadTool.init().then((t) =>
                   t.execute(args, {
                     sessionID: input.sessionID,
@@ -1167,6 +1166,9 @@ export namespace Session {
     command: z.string(),
   })
   export type CommandInput = z.infer<typeof CommandInput>
+  const bashRegex = /!`([^`]+)`/g
+  const fileRegex = /@([^\s]+)/g
+
   export async function command(input: CommandInput) {
     const command = await Command.get(input.command)
     const agent = input.agent ?? command.agent ?? "build"
@@ -1176,6 +1178,22 @@ export namespace Session {
       (await Agent.get(agent).then((x) => (x.model ? `${x.model.providerID}/${x.model.modelID}` : undefined))) ??
       (await Provider.defaultModel().then((x) => `${x.providerID}/${x.modelID}`))
     let template = command.template.replace("$ARGUMENTS", input.arguments)
+
+    const bash = Array.from(template.matchAll(bashRegex))
+    if (bash.length > 0) {
+      const results = await Promise.all(
+        bash.map(async ([, cmd]) => {
+          try {
+            return await $`${{ raw: cmd }}`.nothrow().text()
+          } catch (error) {
+            return `Error executing command: ${error instanceof Error ? error.message : String(error)}`
+          }
+        }),
+      )
+      let index = 0
+      template = template.replace(bashRegex, () => results[index++])
+    }
+
     const parts = [
       {
         type: "text",
@@ -1183,13 +1201,11 @@ export namespace Session {
       },
     ] as ChatInput["parts"]
 
-    const pattern = /@([^\s]+)/g
-    const matches = template.matchAll(pattern)
+    const matches = template.matchAll(fileRegex)
     const app = App.info()
 
     for (const match of matches) {
       const file = path.join(app.path.cwd, match[1])
-      log.info("file", { file })
       parts.push({
         type: "file",
         url: `file://${file}`,
