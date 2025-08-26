@@ -630,9 +630,8 @@ async function fetchPR() {
   // For pr comment:
   //  - include all pr comments
   //  - include all review comments that are
-  const part =
-    Context.eventName() === "pull_request_review_comment_created"
-      ? `
+  const part = isEventPullRequestReviewComment()
+    ? `
       reviewThreads(last: 100) {
         nodes {
           id
@@ -651,7 +650,7 @@ async function fetchPR() {
           }
         }
       }`
-      : `
+    : `
       comments(first: 100) {
         nodes {
           id
