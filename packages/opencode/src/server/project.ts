@@ -30,7 +30,7 @@ export const ProjectRoute = new Hono()
     "/current",
     describeRoute({
       description: "Get the current project",
-      operationId: "butt.current",
+      operationId: "project.current",
       responses: {
         200: {
           description: "Current project",
