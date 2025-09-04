@@ -9,6 +9,7 @@ import { SnapshotCommand } from "./snapshot"
 
 export const DebugCommand = cmd({
   command: "debug",
+  describe: "debugging utilities",
   builder: (yargs) =>
     yargs
       .command(LSPCommand)
@@ -31,6 +32,7 @@ export const DebugCommand = cmd({
 
 const PathsCommand = cmd({
   command: "paths",
+  describe: "list configuration paths",
   handler() {
     for (const [key, value] of Object.entries(Global.Path)) {
       console.log(key.padEnd(10), value)

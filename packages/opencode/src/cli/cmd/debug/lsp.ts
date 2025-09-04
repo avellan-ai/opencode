@@ -5,6 +5,7 @@ import { Log } from "../../../util/log"
 
 export const LSPCommand = cmd({
   command: "lsp",
+  describe: "debug lsp server(s)",
   builder: (yargs) =>
     yargs.command(DiagnosticsCommand).command(SymbolsCommand).command(DocumentSymbolsCommand).demandCommand(),
   async handler() {},
