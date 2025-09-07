@@ -698,7 +698,6 @@ export namespace Session {
         ...ProviderTransform.options(small.providerID, small.modelID, input.sessionID),
         ...small.info.options,
       }
-      // disable/minimize reasoning
       if (small.providerID === "openai") {
         options["reasoningEffort"] = "minimal"
       }
