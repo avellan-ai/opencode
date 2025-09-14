@@ -179,14 +179,22 @@ export namespace ToolRegistry {
     return result
   }
 
+<<<<<<< Updated upstream
   function sanitizeGeminiParameters(schema: z.ZodTypeAny, visited = new Set<z.ZodTypeAny>()): z.ZodTypeAny {
+=======
+  function sanitizeGeminiParameters(schema: z.ZodType, visited = new Set()): z.ZodType {
+>>>>>>> Stashed changes
     if (!schema || visited.has(schema)) {
       return schema
     }
     visited.add(schema)
 
     if (schema instanceof z.ZodDefault) {
+<<<<<<< Updated upstream
       const innerSchema = schema._def.innerType
+=======
+      const innerSchema = schema.unwrap()
+>>>>>>> Stashed changes
       // Handle Gemini's incompatibility with `default` on `anyOf` (unions).
       if (innerSchema instanceof z.ZodUnion) {
         // The schema was `z.union(...).default(...)`, which is not allowed.
@@ -265,14 +273,20 @@ export namespace ToolRegistry {
     return schema
   }
 
-  function optionalToNullable(schema: z.ZodTypeAny): z.ZodTypeAny {
+  function optionalToNullable(schema: z.core.$ZodType): z.core.$ZodType {
     if (schema instanceof z.ZodObject) {
       const shape = schema.shape
-      const newShape: Record<string, z.ZodTypeAny> = {}
+      const newShape: Record<string, z.core.$ZodType> = {}
 
       for (const [key, value] of Object.entries(shape)) {
+<<<<<<< Updated upstream
         if (value instanceof z.ZodOptional) {
           newShape[key] = value.unwrap().nullable()
+=======
+        const zodValue = value as z.ZodTypeAny
+        if (zodValue instanceof z.core.$ZodOptional) {
+          newShape[key] = zodValue.nullable()
+>>>>>>> Stashed changes
         } else {
           newShape[key] = optionalToNullable(value)
         }
