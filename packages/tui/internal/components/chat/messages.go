@@ -898,8 +898,8 @@ func (m *messagesComponent) renderHeader() string {
 					continue
 				}
 				tokens = (usage.Input +
-					usage.Cache.Write +
 					usage.Cache.Read +
+					usage.Cache.Write +
 					usage.Output +
 					usage.Reasoning)
 			}
