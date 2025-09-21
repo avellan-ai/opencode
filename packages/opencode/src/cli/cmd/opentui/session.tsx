@@ -135,16 +135,32 @@ function UserMessage(props: { message: UserMessage; parts: Part[] }) {
 
 function AssistantMessage(props: { message: AssistantMessage; parts: Part[] }) {
   return (
-    <For each={props.parts}>
-      {(part) => {
-        const component = createMemo(() => PART_MAPPING[part.type as keyof typeof PART_MAPPING])
-        return (
-          <Show when={component()}>
-            <Dynamic component={component()} part={part as any} message={props.message} />
-          </Show>
-        )
-      }}
-    </For>
+    <>
+      <For each={props.parts}>
+        {(part) => {
+          const component = createMemo(() => PART_MAPPING[part.type as keyof typeof PART_MAPPING])
+          return (
+            <Show when={component()}>
+              <Dynamic component={component()} part={part as any} message={props.message} />
+            </Show>
+          )
+        }}
+      </For>
+      <Show when={props.message.error}>
+        <box
+          border={["left"]}
+          paddingTop={1}
+          paddingBottom={1}
+          paddingLeft={2}
+          marginTop={1}
+          backgroundColor={Theme.backgroundPanel}
+          customBorderChars={SplitBorder.customBorderChars}
+          borderColor={Theme.error}
+        >
+          <text fg={Theme.textMuted}>{props.message.error?.data.message}</text>
+        </box>
+      </Show>
+    </>
   )
 }
 
