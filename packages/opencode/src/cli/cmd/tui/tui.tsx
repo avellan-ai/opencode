@@ -137,7 +137,7 @@ function App() {
   command.register(() => [
     {
       title: "Switch session",
-      value: "switch-session",
+      value: "session.list",
       category: "Session",
       onSelect: () => {
         dialog.replace(() => <DialogSessionList />)
@@ -145,7 +145,7 @@ function App() {
     },
     {
       title: "New session",
-      value: "new-session",
+      value: "session.new",
       category: "Session",
       onSelect: () => {
         route.navigate({
@@ -156,7 +156,7 @@ function App() {
     },
     {
       title: "Switch model",
-      value: "switch-model",
+      value: "model.list",
       category: "Agent",
       onSelect: () => {
         dialog.replace(() => <DialogModel />)
@@ -164,7 +164,7 @@ function App() {
     },
     {
       title: "Switch agent",
-      value: "switch-agent",
+      value: "agent.list",
       category: "Agent",
       onSelect: () => {
         dialog.replace(() => <DialogAgent />)

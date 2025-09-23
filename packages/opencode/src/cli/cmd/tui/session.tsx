@@ -49,8 +49,27 @@ export function Session() {
       })
   })
 
+  const local = useLocal()
+
   const command = useCommandDialog()
   command.register(() => [
+    {
+      title: "Compact session",
+      value: "session.compact",
+      category: "Session",
+      onSelect: (dialog) => {
+        sdk.session.summarize({
+          path: {
+            id: route.sessionID,
+          },
+          body: {
+            modelID: local.model.current().modelID,
+            providerID: local.model.current().providerID,
+          },
+        })
+        dialog.clear()
+      },
+    },
     {
       title: "Share session",
       value: "session.share",
@@ -78,6 +97,12 @@ export function Session() {
         })
         dialog.clear()
       },
+    },
+    {
+      title: "Rename session",
+      value: "session.rename",
+      category: "Session",
+      onSelect: () => {},
     },
   ])
 

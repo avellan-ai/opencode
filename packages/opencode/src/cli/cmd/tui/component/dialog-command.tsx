@@ -16,16 +16,25 @@ const ctx = createContext<Context>()
 
 function init() {
   const [registrations, setRegistrations] = createSignal<Accessor<DialogSelectOption[]>[]>([])
+  const dialog = useDialog()
   const options = createMemo(() => {
     return registrations().flatMap((x) => x())
   })
 
   return {
+    trigger(name: string) {
+      for (const option of options()) {
+        if (option.value === name) {
+          option.onSelect?.(dialog)
+          return
+        }
+      }
+    },
     register(cb: () => DialogSelectOption[]) {
       const results = createMemo(cb)
-      setRegistrations((x) => [...x, results])
+      setRegistrations((arr) => [results, ...arr])
       onCleanup(() => {
-        setRegistrations((x) => x.filter((x) => x !== results))
+        setRegistrations((arr) => arr.filter((x) => x !== results))
       })
     },
     get options() {

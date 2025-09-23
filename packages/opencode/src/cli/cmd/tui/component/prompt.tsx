@@ -14,6 +14,7 @@ import type { FilePart } from "@opencode-ai/sdk"
 import fuzzysort from "fuzzysort"
 import { DialogModel } from "./dialog-model"
 import { DialogAgent } from "./dialog-agent"
+import { useCommandDialog } from "./dialog-command"
 
 export type PromptProps = {
   sessionID?: string
@@ -254,6 +255,7 @@ function Autocomplete(props: {
   const sdk = useSDK()
   const local = useLocal()
   const sync = useSync()
+  const command = useCommandDialog()
 
   const [store, setStore] = createStore({
     index: 0,
@@ -310,12 +312,10 @@ function Autocomplete(props: {
     },
   )
 
-  const route = useRoute()
   const session = createMemo(() => (props.sessionID ? sync.session.get(props.sessionID) : undefined))
   const commands = createMemo((): AutocompleteOption[] => {
     const results: AutocompleteOption[] = []
     const s = session()
-    const dialog = useDialog()
     for (const command of sync.data.command) {
       results.push({
         display: "/" + command.name,
@@ -341,41 +341,19 @@ function Autocomplete(props: {
         {
           display: "/compact",
           description: "compact the session",
-          onSelect: () => {
-            sdk.session.summarize({
-              path: {
-                id: s.id,
-              },
-              body: {
-                modelID: local.model.current().modelID,
-                providerID: local.model.current().providerID,
-              },
-            })
-          },
+          onSelect: () => command.trigger("session.compact"),
         },
         {
           display: "/share",
           disabled: !!s.share?.url,
           description: "share a session",
-          onSelect: () => {
-            sdk.session.share({
-              path: {
-                id: s.id,
-              },
-            })
-          },
+          onSelect: () => command.trigger("session.share"),
         },
         {
           display: "/unshare",
           disabled: !s.share,
           description: "unshare a session",
-          onSelect: () => {
-            sdk.session.unshare({
-              path: {
-                id: s.id,
-              },
-            })
-          },
+          onSelect: () => command.trigger("session.unshare"),
         },
       )
     }
@@ -383,25 +361,17 @@ function Autocomplete(props: {
       {
         display: "/new",
         description: "create a new session",
-        onSelect: () => {
-          route.navigate({
-            type: "home",
-          })
-        },
+        onSelect: () => command.trigger("session.new"),
       },
       {
         display: "/models",
         description: "list models",
-        onSelect: () => {
-          dialog.replace(() => <DialogModel />)
-        },
+        onSelect: () => command.trigger("model.list"),
       },
       {
         display: "/agents",
         description: "list agents",
-        onSelect: () => {
-          dialog.replace(() => <DialogAgent />)
-        },
+        onSelect: () => command.trigger("agent.list"),
       },
     )
     const max = firstBy(results, [(x) => x.display.length, "desc"])?.display.length

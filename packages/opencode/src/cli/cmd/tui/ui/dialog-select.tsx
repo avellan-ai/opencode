@@ -155,7 +155,8 @@ export function DialogSelect<T>(props: DialogSelectProps<T>) {
           )}
         </For>
       </scrollbox>
-      <box paddingRight={2} paddingLeft={3} paddingBottom={1} flexDirection="row">
+      <box paddingRight={2} paddingLeft={3} flexDirection="row">
+        {/*
         <text fg={Theme.text} attributes={TextAttributes.BOLD}>
           n
         </text>
@@ -164,6 +165,7 @@ export function DialogSelect<T>(props: DialogSelectProps<T>) {
           {"   "}r
         </text>
         <text fg={Theme.textMuted}> rename</text>
+        */}
       </box>
     </box>
   )
