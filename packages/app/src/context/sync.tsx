@@ -112,7 +112,7 @@ function init() {
     sdk.file.list({ query: { path: "/" } }).then((x) => setStore("node", x.data!)),
   ]).then(() => setStore("ready", true))
 
-  return {
+  const result = {
     data: store,
     set: setStore,
     session: {
@@ -142,6 +142,7 @@ function init() {
       },
     },
   }
+  return result
 }
 
 type SyncContext = ReturnType<typeof init>

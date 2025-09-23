@@ -106,7 +106,7 @@ function init() {
     sdk.command.list().then((x) => setStore("command", x.data ?? [])),
   ]).then(() => setStore("ready", true))
 
-  return {
+  const result = {
     data: store,
     set: setStore,
     session: {
@@ -114,6 +114,16 @@ function init() {
         const match = Binary.search(store.session, sessionID, (s) => s.id)
         if (match.found) return store.session[match.index]
         return undefined
+      },
+      status(sessionID: string) {
+        const session = result.session.get(sessionID)
+        if (!session) return "idle"
+        if (session.time.compacting) return "compacting"
+        const messages = store.message[sessionID] ?? []
+        const last = messages.at(-1)
+        if (!last) return "idle"
+        if (last.role === "user") return "working"
+        return last.time.completed ? "idle" : "working"
       },
       async sync(sessionID: string) {
         const [session, messages, todo] = await Promise.all([
@@ -135,6 +145,7 @@ function init() {
       },
     },
   }
+  return result
 }
 
 type SyncContext = ReturnType<typeof init>

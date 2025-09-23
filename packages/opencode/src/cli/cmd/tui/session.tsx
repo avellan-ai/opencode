@@ -26,6 +26,7 @@ import type { TaskTool } from "../../../tool/task"
 import { useKeyboard, type BoxProps, type JSX } from "@opentui/solid"
 import { useSDK } from "./context/sdk"
 import { useCommandDialog } from "./component/dialog-command"
+import { Shimmer } from "./ui/shimmer"
 
 export function Session() {
   const route = useRouteData("session")
@@ -193,6 +194,7 @@ function UserMessage(props: { message: UserMessage; parts: Part[] }) {
 }
 
 function AssistantMessage(props: { message: AssistantMessage; parts: Part[] }) {
+  const local = useLocal()
   return (
     <>
       <For each={props.parts}>
@@ -217,6 +219,15 @@ function AssistantMessage(props: { message: AssistantMessage; parts: Part[] }) {
           borderColor={Theme.error}
         >
           <text fg={Theme.textMuted}>{props.message.error?.data.message}</text>
+        </box>
+      </Show>
+      <Show when={!props.message.time.completed}>
+        <box paddingLeft={3} marginTop={1} flexDirection="row" gap={1}>
+          <text fg={local.agent.color(props.message.mode)}>{Locale.titlecase(props.message.mode)}</text>
+          <text fg={Theme.textMuted}>
+            {props.message.providerID}/{props.message.modelID}
+          </text>
+          <Shimmer text={props.message.summary ? "Compacting..." : "Generating..."} color={Theme.text} />
         </box>
       </Show>
     </>
@@ -252,10 +263,12 @@ function TextPart(props: { part: TextPart; message: AssistantMessage }) {
   return (
     <box paddingLeft={3} marginTop={1} flexShrink={0}>
       <text>{props.part.text.trim()}</text>
-      <text>
-        <span style={{ fg: local.agent.color(agent().name) }}>{Locale.titlecase(agent().name)}</span>{" "}
-        <span style={{ fg: Theme.textMuted }}>{props.message.providerID + "/" + props.message.modelID}</span>
-      </text>
+      <Show when={props.message.time.completed}>
+        <text>
+          <span style={{ fg: local.agent.color(agent().name) }}>{Locale.titlecase(agent().name)}</span>{" "}
+          <span style={{ fg: Theme.textMuted }}>{props.message.providerID + "/" + props.message.modelID}</span>
+        </text>
+      </Show>
     </box>
   )
 }

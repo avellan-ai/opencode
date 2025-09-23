@@ -34,15 +34,7 @@ export function Prompt(props: PromptProps) {
   const sdk = useSDK()
   const route = useRoute()
   const sync = useSync()
-  const session = createMemo(() => (props.sessionID ? sync.session.get(props.sessionID) : undefined))
-
-  const messages = createMemo(() => (props.sessionID ? (sync.data.message[props.sessionID] ?? []) : []))
-  const working = createMemo(() => {
-    const last = messages()[messages().length - 1]
-    if (!last) return false
-    if (last.role === "user") return true
-    return !last.time.completed
-  })
+  const status = createMemo(() => (props.sessionID ? sync.session.status(props.sessionID) : "idle"))
 
   const [store, setStore] = createStore<Prompt>({
     input: "",
@@ -204,10 +196,10 @@ export function Prompt(props: PromptProps) {
             <span style={{ bold: true }}>{local.model.parsed().model}</span>
           </text>
           <Switch>
-            <Match when={session()?.time.compacting}>
+            <Match when={status() === "compacting"}>
               <text fg={Theme.textMuted}>compacting...</text>
             </Match>
-            <Match when={working()}>
+            <Match when={status() === "working"}>
               <box flexDirection="row" gap={1}>
                 <text>
                   esc <span style={{ fg: Theme.textMuted }}>interrupt</span>
