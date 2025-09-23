@@ -12,8 +12,6 @@ import { Identifier } from "../../../../id/id"
 import { createStore, produce } from "solid-js/store"
 import type { FilePart } from "@opencode-ai/sdk"
 import fuzzysort from "fuzzysort"
-import { DialogModel } from "./dialog-model"
-import { DialogAgent } from "./dialog-agent"
 import { useCommandDialog } from "./dialog-command"
 
 export type PromptProps = {
@@ -253,7 +251,6 @@ function Autocomplete(props: {
   ref: (ref: AutocompleteRef) => void
 }) {
   const sdk = useSDK()
-  const local = useLocal()
   const sync = useSync()
   const command = useCommandDialog()
 
