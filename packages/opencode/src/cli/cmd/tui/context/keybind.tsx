@@ -4,7 +4,7 @@ import { Keybind } from "../../../../util/keybind"
 import { pipe, mapValues } from "remeda"
 import type { KeybindsConfig } from "@opencode-ai/sdk"
 import { createContext } from "solid-js"
-import type { ParsedKey } from "@opentui/core"
+import type { ParsedKey, Renderable } from "@opentui/core"
 import { createStore } from "solid-js/store"
 import { useKeyboard, useRenderer } from "@opentui/solid"
 import { Instance } from "../../../../project/instance"
@@ -12,7 +12,6 @@ import { Instance } from "../../../../project/instance"
 export function init() {
   const sync = useSync()
   const keybinds = createMemo(() => {
-    console.log(sync.data.config.keybinds)
     return pipe(
       DEFAULT_KEYBINDS,
       (val) => Object.assign(val, sync.data.config.keybinds),
@@ -22,14 +21,38 @@ export function init() {
   const [store, setStore] = createStore({
     leader: false,
   })
-
   const renderer = useRenderer()
-  useKeyboard(async (evt) => {
-    if (result.match("leader", evt)) {
-      setStore("leader", !store.leader)
+
+  let focus: Renderable | null
+  function leader(active: boolean) {
+    if (active) {
+      setStore("leader", true)
+      focus = renderer.currentFocusedRenderable
+      focus?.blur()
       setTimeout(() => {
-        setStore("leader", false)
+        leader(false)
       }, 2000)
+      return
+    }
+
+    if (!active) {
+      if (focus && !renderer.currentFocusedRenderable) {
+        focus.focus()
+      }
+      setStore("leader", false)
+    }
+  }
+
+  useKeyboard(async (evt) => {
+    if (!store.leader && result.match("leader", evt)) {
+      leader(true)
+      return
+    }
+
+    if (store.leader) {
+      setImmediate(() => {
+        leader(false)
+      })
     }
 
     if (result.match("app_exit", evt)) {
