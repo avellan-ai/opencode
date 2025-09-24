@@ -27,6 +27,7 @@ import { useKeyboard, type BoxProps, type JSX } from "@opentui/solid"
 import { useSDK } from "./context/sdk"
 import { useCommandDialog } from "./component/dialog-command"
 import { Shimmer } from "./ui/shimmer"
+import { useKeybind } from "./context/keybind"
 
 export function Session() {
   const route = useRouteData("session")
@@ -39,9 +40,10 @@ export function Session() {
   createEffect(() => sync.session.sync(route.sessionID))
   const sdk = useSDK()
 
+  const keybind = useKeybind()
   useKeyboard((evt) => {
-    if (evt.name === "pageup") scroll.scrollBy(-scroll.height / 2)
-    if (evt.name === "pagedown") scroll.scrollBy(scroll.height / 2)
+    if (keybind.match("messages_page_up", evt)) scroll.scrollBy(-scroll.height / 2)
+    if (keybind.match("messages_page_down", evt)) scroll.scrollBy(scroll.height / 2)
     if (evt.name === "escape")
       sdk.session.abort({
         path: {

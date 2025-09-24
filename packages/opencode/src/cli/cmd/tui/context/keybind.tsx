@@ -6,7 +6,8 @@ import type { KeybindsConfig } from "@opencode-ai/sdk"
 import { createContext } from "solid-js"
 import type { ParsedKey } from "@opentui/core"
 import { createStore } from "solid-js/store"
-import { useKeyboard } from "@opentui/solid"
+import { useKeyboard, useRenderer } from "@opentui/solid"
+import { Instance } from "../../../../project/instance"
 
 export function init() {
   const sync = useSync()
@@ -22,12 +23,18 @@ export function init() {
     leader: false,
   })
 
-  useKeyboard((evt) => {
+  const renderer = useRenderer()
+  useKeyboard(async (evt) => {
     if (result.match("leader", evt)) {
       setStore("leader", !store.leader)
       setTimeout(() => {
         setStore("leader", false)
       }, 2000)
+    }
+
+    if (result.match("app_exit", evt)) {
+      await Instance.disposeAll()
+      renderer.destroy()
     }
   })
 

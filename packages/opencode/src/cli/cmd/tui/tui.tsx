@@ -13,12 +13,10 @@ import { SyncProvider } from "./context/sync"
 import { LocalProvider, useLocal } from "./context/local"
 import { DialogModel } from "./component/dialog-model"
 import { Session } from "./session"
-import { Instance } from "../../../project/instance"
-import { EventLoop } from "../../../util/eventloop"
 import { CommandProvider, useCommandDialog } from "./component/dialog-command"
 import { DialogAgent } from "./component/dialog-agent"
 import { DialogSessionList } from "./component/dialog-session-list"
-import { KeybindProvider } from "./context/keybind"
+import { KeybindProvider, useKeybind } from "./context/keybind"
 
 export const TuiCommand = cmd({
   command: "$0 [project]",
@@ -67,15 +65,6 @@ export const TuiCommand = cmd({
   handler: async () => {
     await render(
       () => {
-        const renderer = useRenderer()
-        useKeyboard(async (evt) => {
-          if (!evt.name) return
-          if (evt.name === "c" && evt.ctrl) {
-            await Instance.disposeAll()
-            renderer.destroy()
-            await EventLoop.wait()
-          }
-        })
         return (
           <RouteProvider>
             <ThemeProvider>
@@ -113,11 +102,15 @@ function App() {
   const dialog = useDialog()
   const local = useLocal()
   const command = useCommandDialog()
+  const keybind = useKeybind()
 
   useKeyboard(async (evt) => {
-    if (evt.name === "tab") {
-      local.agent.move(evt.shift ? -1 : 1)
+    if (keybind.match("agent_cycle", evt)) {
+      local.agent.move(1)
       return
+    }
+    if (keybind.match("agent_cycle_reverse", evt)) {
+      local.agent.move(-1)
     }
 
     if (evt.meta && evt.name === "t") {
@@ -127,10 +120,6 @@ function App() {
 
     if (evt.meta && evt.name === "d") {
       renderer.console.toggle()
-      return
-    }
-    if (evt.meta && evt.name === "m") {
-      dialog.replace(() => <DialogModel />)
       return
     }
   })
