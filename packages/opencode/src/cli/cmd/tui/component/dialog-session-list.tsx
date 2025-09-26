@@ -12,19 +12,21 @@ export function DialogSessionList() {
 
   const options = createMemo(() => {
     const today = new Date().toDateString()
-    return sync.data.session.map((x) => {
-      const date = new Date(x.time.updated)
-      let category = date.toDateString()
-      if (category === today) {
-        category = "Today"
-      }
-      return {
-        title: x.title,
-        value: x.id,
-        category,
-        footer: Locale.time(x.time.updated),
-      }
-    })
+    return sync.data.session
+      .filter((x) => x.parentID === undefined)
+      .map((x) => {
+        const date = new Date(x.time.updated)
+        let category = date.toDateString()
+        if (category === today) {
+          category = "Today"
+        }
+        return {
+          title: x.title,
+          value: x.id,
+          category,
+          footer: Locale.time(x.time.updated),
+        }
+      })
   })
 
   onMount(() => {
