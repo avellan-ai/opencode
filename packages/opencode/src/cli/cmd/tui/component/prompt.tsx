@@ -18,6 +18,7 @@ import { Clipboard } from "@/util/clipboard"
 
 export type PromptProps = {
   sessionID?: string
+  onSubmit?: () => void
 }
 
 type Prompt = {
@@ -164,6 +165,7 @@ export function Prompt(props: PromptProps) {
                     input: "",
                     parts: [],
                   })
+                  props.onSubmit?.()
                   return
                 }
                 const parts = store.parts
@@ -193,6 +195,7 @@ export function Prompt(props: PromptProps) {
                     ],
                   },
                 })
+                props.onSubmit?.()
               }}
               ref={(r) => (input = r)}
               onMouseDown={(r) => r.target?.focus()}

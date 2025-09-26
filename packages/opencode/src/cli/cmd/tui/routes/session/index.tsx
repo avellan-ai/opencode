@@ -35,12 +35,14 @@ export function Session() {
   const session = createMemo(() => sync.session.get(route.sessionID)!)
   const messages = createMemo(() => sync.data.message[route.sessionID] ?? [])
   const todo = createMemo(() => sync.data.todo[route.sessionID] ?? [])
-  let scroll: ScrollBoxRenderable
 
   createEffect(() => sync.session.sync(route.sessionID))
+
   const sdk = useSDK()
 
+  let scroll: ScrollBoxRenderable
   const keybind = useKeybind()
+
   useKeyboard((evt) => {
     if (keybind.match("messages_page_up", evt)) scroll.scrollBy(-scroll.height / 2)
     if (keybind.match("messages_page_down", evt)) scroll.scrollBy(scroll.height / 2)
@@ -142,7 +144,12 @@ export function Session() {
           </box>
         </Show>
         <box flexShrink={0}>
-          <Prompt sessionID={route.sessionID} />
+          <Prompt
+            onSubmit={() => {
+              scroll.scrollTo(scroll.scrollHeight)
+            }}
+            sessionID={route.sessionID}
+          />
         </box>
       </Show>
     </box>
