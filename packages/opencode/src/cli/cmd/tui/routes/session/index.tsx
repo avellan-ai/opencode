@@ -174,13 +174,17 @@ export function Session() {
        if (!diffText) return []
        
        const patches = parsePatch(diffText)
-       return patches.map(patch => ({
-         filename: patch.oldFileName || patch.newFileName || 'unknown',
-         additions: patch.hunks.reduce((sum, hunk) => 
-           sum + hunk.lines.filter(line => line.startsWith('+')).length, 0),
-         deletions: patch.hunks.reduce((sum, hunk) => 
-           sum + hunk.lines.filter(line => line.startsWith('-')).length, 0)
-       }))
+       return patches.map(patch => {
+         const filename = patch.newFileName || patch.oldFileName || 'unknown'
+         const cleanFilename = filename.replace(/^[ab]\//, '')
+         return {
+           filename: cleanFilename,
+           additions: patch.hunks.reduce((sum, hunk) => 
+             sum + hunk.lines.filter(line => line.startsWith('+')).length, 0),
+           deletions: patch.hunks.reduce((sum, hunk) => 
+             sum + hunk.lines.filter(line => line.startsWith('-')).length, 0)
+         }
+       })
      })()
 
      return {
@@ -221,13 +225,21 @@ export function Session() {
                         <span style={{ fg: Theme.text }}>{keybind.print("messages_redo")}</span> or /redo to restore
                       </text>
                        <Show when={revert()!.diffFiles?.length}>
-                         <For each={revert()!.diffFiles}>
-                           {(file) => (
-                             <text fg={Theme.textMuted}>
-                               {file.filename}: +{file.additions} -{file.deletions}
-                             </text>
-                           )}
-                         </For>
+                         <box marginTop={1}>
+                           <For each={revert()!.diffFiles}>
+                             {(file) => (
+                               <text>
+                                 {file.filename}
+                                 <Show when={file.additions > 0}>
+                                   <span style={{ fg: Theme.diffAdded }}> +{file.additions}</span>
+                                 </Show>
+                                 <Show when={file.deletions > 0}>
+                                   <span style={{ fg: Theme.diffRemoved }}> -{file.deletions}</span>
+                                 </Show>
+                               </text>
+                             )}
+                           </For>
+                         </box>
                        </Show>
                     </box>
                   </box>
