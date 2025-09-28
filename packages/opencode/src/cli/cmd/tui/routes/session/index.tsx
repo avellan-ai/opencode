@@ -28,6 +28,7 @@ import { useCommandDialog } from "@tui/component/dialog-command"
 import { Shimmer } from "@tui/ui/shimmer"
 import { useKeybind } from "@tui/context/keybind"
 import { Header } from "./header"
+import { parsePatch } from "diff"
 
 export function Session() {
   const route = useRouteData("session")
@@ -161,18 +162,34 @@ export function Session() {
     },
   ])
 
-  const revert = createMemo(() => {
-    const s = session()
-    if (!s) return
-    const messageID = s.revert?.messageID
-    if (!messageID) return
-    const reverted = messages().filter((x) => x.id >= messageID && x.role === "user")
+   const revert = createMemo(() => {
+     const s = session()
+     if (!s) return
+     const messageID = s.revert?.messageID
+     if (!messageID) return
+     const reverted = messages().filter((x) => x.id >= messageID && x.role === "user")
 
-    return {
-      messageID,
-      reverted,
-    }
-  })
+     const diffFiles = (() => {
+       const diffText = s.revert?.diff || ""
+       if (!diffText) return []
+       
+       const patches = parsePatch(diffText)
+       return patches.map(patch => ({
+         filename: patch.oldFileName || patch.newFileName || 'unknown',
+         additions: patch.hunks.reduce((sum, hunk) => 
+           sum + hunk.lines.filter(line => line.startsWith('+')).length, 0),
+         deletions: patch.hunks.reduce((sum, hunk) => 
+           sum + hunk.lines.filter(line => line.startsWith('-')).length, 0)
+       }))
+     })()
+
+     return {
+       messageID,
+       reverted,
+       diff: s.revert!.diff,
+       diffFiles,
+     }
+   })
 
   return (
     <box paddingTop={1} paddingBottom={1} paddingLeft={2} paddingRight={2} flexGrow={1}>
@@ -203,6 +220,15 @@ export function Session() {
                       <text fg={Theme.textMuted}>
                         <span style={{ fg: Theme.text }}>{keybind.print("messages_redo")}</span> or /redo to restore
                       </text>
+                       <Show when={revert()!.diffFiles?.length}>
+                         <For each={revert()!.diffFiles}>
+                           {(file) => (
+                             <text fg={Theme.textMuted}>
+                               {file.filename}: +{file.additions} -{file.deletions}
+                             </text>
+                           )}
+                         </For>
+                       </Show>
                     </box>
                   </box>
                 </Match>
