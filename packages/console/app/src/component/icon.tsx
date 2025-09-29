@@ -34,28 +34,23 @@ export function IconLogo(props: JSX.SvgSVGAttributes<SVGSVGElement>) {
 
 export function IconCopy(props: JSX.SvgSVGAttributes<SVGSVGElement>) {
   return (
-  <svg {...props} width="24" height="24" viewBox="0 0 24 24" fill="none"
-       xmlns="http://www.w3.org/2000/svg">
-    <path
-      d="M8.75 8.75V2.75H21.25V15.25H15.25M15.25 8.75H2.75V21.25H15.25V8.75Z"
-      stroke="#8E8B8B" stroke-width="1.5" stroke-linecap="square"/>
-  </svg>
-
-
-)
+    <svg {...props} width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M8.75 8.75V2.75H21.25V15.25H15.25M15.25 8.75H2.75V21.25H15.25V8.75Z"
+        stroke="#8E8B8B"
+        stroke-width="1.5"
+        stroke-linecap="square"
+      />
+    </svg>
+  )
 }
 
 export function IconCheck(props: JSX.SvgSVGAttributes<SVGSVGElement>) {
   return (
-
-  <svg {...props} width="24" height="24" viewBox="0 0 24 24" fill="none"
-       xmlns="http://www.w3.org/2000/svg">
-    <path d="M2.75 15.0938L9 20.25L21.25 3.75" stroke="#03B000" stroke-width="2"
-          stroke-linecap="square"/>
-  </svg>
-
-
-)
+    <svg {...props} width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M2.75 15.0938L9 20.25L21.25 3.75" stroke="#03B000" stroke-width="2" stroke-linecap="square" />
+    </svg>
+  )
 }
 
 export function IconCreditCard(props: JSX.SvgSVGAttributes<SVGSVGElement>) {

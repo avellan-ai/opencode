@@ -17,7 +17,6 @@
   --color-background-interactive: hsl(62, 84%, 88%);
   --color-background-interactive-weaker: hsl(64, 74%, 95%);
 
-
   --color-text: hsl(0, 1%, 39%);
   --color-text-weak: hsl(0, 1%, 74%);
   --color-text-weaker: hsl(30, 2%, 81%);
@@ -28,7 +27,6 @@
   --color-border-weak: hsl(0, 1%, 85%);
 
   --color-icon: hsl(0, 1%, 55%);
-
 }
 
 [data-page="opencode"] {
@@ -86,7 +84,6 @@
   }
 
   [data-component="content"] {
-
   }
 
   [data-component="top"] {
@@ -101,7 +98,6 @@
     border-bottom: 1px solid var(--color-border-weak);
 
     z-index: 10;
-
 
     img {
       height: 28px;
@@ -178,7 +174,6 @@
       }
     }
 
-
     [data-slot="logo dark"] {
       display: none;
     }
@@ -191,11 +186,7 @@
         display: block;
       }
     }
-
-
   }
-
-
 
   [data-component="hero"] {
     display: flex;
@@ -214,7 +205,6 @@
       }
     }
   }
-
 
   /* Tablist */
   [data-component="tabs"] > [data-slot="tablist"] {
@@ -246,7 +236,6 @@
     border-bottom-color: var(--color-background-strong);
   }
   [data-slot="tab"]:focus-visible {
-
   }
 
   /* Panels wrapper */
@@ -264,7 +253,7 @@
     margin: 0;
     overflow: auto;
     white-space: pre-wrap;
-    transition: opacity .18s ease;
+    transition: opacity 0.18s ease;
     font-size: 16px;
     font-family: var(--font-mono);
 
@@ -295,9 +284,6 @@
     display: none !important;
     opacity: 0;
   }
-
-
-
 
   [data-component="center"] {
     display: block;
@@ -347,7 +333,6 @@
       a:hover {
         background: var(--color-background-strong-hover);
       }
-
     }
     [data-slot="model-logos"] {
       display: flex;
@@ -364,8 +349,6 @@
         }
       }
     }
-
-
 
     [data-slot="pricing-copy"] {
       strong {
@@ -385,7 +368,6 @@
         }
       }
     }
-
   }
 
   [data-component="comparison"] {
@@ -397,7 +379,6 @@
       display: block;
     }
   }
-
 
   [data-slot="section-title"] {
     margin-bottom: 24px;
@@ -424,14 +405,10 @@
     }
   }
 
-
-
-
   [data-component="what"] {
     border-top: 1px solid var(--color-border-weak);
     padding: var(--vertical-padding) var(--padding);
     color: var(--color-text-secondary);
-
 
     ul {
       padding: 0;
@@ -472,7 +449,6 @@
     padding: var(--vertical-padding) var(--padding);
 
     [data-slot="privacy-title"] {
-
       h3 {
         font-size: 16px;
         font-weight: 500;
@@ -494,18 +470,15 @@
         gap: 12px;
       }
     }
-
   }
 
   [data-component="zen-cta"] {
     border-top: 1px solid var(--color-border-weak);
     display: flex;
     padding: var(--vertical-padding) var(--padding);
-
   }
 
   [data-slot="zen-cta-copy"] {
-
     strong {
       color: var(--color-text-strong);
       font-weight: 500;
@@ -541,7 +514,6 @@
     a:hover {
       background: var(--color-background-weak);
     }
-
   }
   [data-slot="model-logos"] {
     display: flex;
@@ -566,13 +538,19 @@
 
     [data-slot="dock"] {
       border-radius: 14px;
-      border: 0.5px solid rgba(176, 176, 176, 0.60);
-      background: #F2F1F0;
+      border: 0.5px solid rgba(176, 176, 176, 0.6);
+      background: #f2f1f0;
       margin-bottom: 32px;
       overflow: hidden;
       height: 64px;
       width: 185px;
-      box-shadow: 0 6px 80px 0 rgba(0, 0, 0, 0.05), 0 2.507px 33.422px 0 rgba(0, 0, 0, 0.04), 0 1.34px 17.869px 0 rgba(0, 0, 0, 0.03), 0 0.751px 10.017px 0 rgba(0, 0, 0, 0.03), 0 0.399px 5.32px 0 rgba(0, 0, 0, 0.02), 0 0.166px 2.214px 0 rgba(0, 0, 0, 0.01);
+      box-shadow:
+        0 6px 80px 0 rgba(0, 0, 0, 0.05),
+        0 2.507px 33.422px 0 rgba(0, 0, 0, 0.04),
+        0 1.34px 17.869px 0 rgba(0, 0, 0, 0.03),
+        0 0.751px 10.017px 0 rgba(0, 0, 0, 0.03),
+        0 0.399px 5.32px 0 rgba(0, 0, 0, 0.02),
+        0 0.166px 2.214px 0 rgba(0, 0, 0, 0.01);
 
       img {
         width: 100%;
@@ -580,10 +558,8 @@
       }
 
       @media (prefers-color-scheme: dark) {
-        background: #312D2D;
+        background: #312d2d;
       }
-
-
     }
 
     [data-slot="form"] {
@@ -660,7 +636,6 @@
       color: var(--color-text-strong);
       font-weight: 500;
       cursor: pointer;
-
     }
 
     [data-slot="faq-answer"] {
@@ -716,8 +691,6 @@
           width: 24px;
           border-radius: 24px;
         }
-
-
       }
 
       [data-slot="quote"] {
@@ -732,7 +705,6 @@
         }
       }
     }
-
 
     [data-slot="button"] {
       all: unset;
@@ -761,8 +733,6 @@
       }
     }
   }
-
-
 
   [data-component="copy-status"] {
     @media (max-width: 38rem) {
@@ -834,7 +804,6 @@
       [data-slot="cell"]:nth-child(1) {
         border-top: none;
       }
-
     }
   }
 
