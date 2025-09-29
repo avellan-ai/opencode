@@ -50,7 +50,7 @@ export function DialogSessionList() {
         {
           keybind: Keybind.parse("del")[0],
           title: "delete",
-          onTrigger: (option) => {},
+          onTrigger: () => {},
         },
       ]}
     />
