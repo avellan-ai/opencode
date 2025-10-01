@@ -89,16 +89,8 @@
     margin-top: 48px;
     margin-left: 40px;
     display: flex;
-    gap: 96px !important;
-
-    @media (max-width: 80rem) {
-      gap: 72px !important;
-    }
-
-    @media (max-width: 70rem) {
-      gap: 64px !important;
-    }
-
+    gap: 64px !important;
+    
     @media (max-width: 60rem) {
       gap: 56px !important;
     }
