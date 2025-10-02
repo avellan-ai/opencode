@@ -62,11 +62,6 @@ export const { use: useKeybind, provider: KeybindProvider } = createSimpleContex
           leader(false)
         })
       }
-
-      if (result.match("app_exit", evt)) {
-        await Instance.disposeAll()
-        renderer.destroy()
-      }
     })
 
     const result = {
