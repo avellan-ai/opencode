@@ -42,7 +42,7 @@ export function Autocomplete(props: {
     position: { x: 0, y: 0, width: 0 },
   })
   const filter = createMemo(() => {
-    if (!store.visible) return ""
+    if (!store.visible) return
     return props.value.substring(store.index + 1).split(" ")[0]
   })
 
@@ -53,7 +53,7 @@ export function Autocomplete(props: {
       if (store.visible === "/") return []
       const result = await sdk.find.files({
         query: {
-          query: filter(),
+          query: filter() ?? "",
         },
       })
       if (result.error) return []
@@ -166,7 +166,7 @@ export function Autocomplete(props: {
       (x) => x.disabled !== true,
     )
     if (!filter()) return mixed
-    const result = fuzzysort.go(filter(), mixed, {
+    const result = fuzzysort.go(filter()!, mixed, {
       keys: ["display", "description"],
     })
     return result.map((arr) => arr.obj)
