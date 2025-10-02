@@ -110,6 +110,7 @@ export function Prompt(props: PromptProps) {
           command: input,
         },
       })
+      setStore("mode", "normal")
     } else if (input.startsWith("/")) {
       const [command, ...args] = input.split(" ")
       sdk.session.command({
@@ -230,10 +231,12 @@ export function Prompt(props: PromptProps) {
                   e.preventDefault()
                   return
                 }
-                if (e.name === "backspace" && input.cursorPosition === 0 && store.mode === "shell") {
-                  setStore("mode", "normal")
-                  e.preventDefault()
-                  return
+                if (store.mode === "shell") {
+                  if ((e.name === "backspace" && input.cursorPosition === 0) || e.name === "escape") {
+                    setStore("mode", "normal")
+                    e.preventDefault()
+                    return
+                  }
                 }
                 if (store.mode === "normal") autocomplete.onKeyDown(e)
                 if (!autocomplete.visible) {
