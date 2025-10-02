@@ -48,9 +48,11 @@
       "name": "@opencode/console-app",
       "dependencies": {
         "@ibm/plex": "6.4.1",
+        "@jsx-email/render": "1.1.1",
         "@kobalte/core": "catalog:",
         "@openauthjs/openauth": "catalog:",
         "@opencode/console-core": "workspace:*",
+        "@opencode/console-mail": "workspace:*",
         "@solidjs/meta": "^0.29.4",
         "@solidjs/router": "^0.15.0",
         "@solidjs/start": "^1.1.0",
