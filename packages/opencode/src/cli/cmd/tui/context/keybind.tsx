@@ -121,6 +121,7 @@ const DEFAULT_KEYBINDS: KeybindsConfig = {
   session_compact: "<leader>c",
   session_child_cycle: "ctrl+right",
   session_child_cycle_reverse: "ctrl+left",
+  session_timeline: "<leader>t",
   messages_page_up: "pageup",
   messages_page_down: "pagedown",
   messages_half_page_up: "ctrl+alt+u",
