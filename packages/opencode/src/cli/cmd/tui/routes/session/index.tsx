@@ -34,6 +34,7 @@ import { DialogMessage } from "./dialog-message"
 import type { PromptInfo } from "../../component/prompt/history"
 import { iife } from "@/util/iife"
 import { DialogConfirm } from "@tui/ui/dialog-confirm"
+import { DialogTimeline } from "./dialog-timeline"
 
 export function Session() {
   const route = useRouteData("session")
@@ -94,6 +95,27 @@ export function Session() {
 
   const command = useCommandDialog()
   command.register(() => [
+    {
+      title: "Jump to message",
+      value: "session.timeline",
+      keybind: "session_timeline",
+      category: "Session",
+      onSelect: (dialog) => {
+        dialog.replace(() => (
+          <DialogTimeline
+            onMove={(messageID) => {
+              try {
+                const child = scroll.getChildren().find((child) => {
+                  return child.id === messageID
+                })
+                if (child) scroll.scrollBy(child.y - scroll.y - 1)
+              } catch {}
+            }}
+            sessionID={route.sessionID}
+          />
+        ))
+      },
+    },
     {
       title: "Compact session",
       value: "session.compact",
@@ -388,6 +410,7 @@ function UserMessage(props: { message: UserMessage; parts: Part[]; onMouseUp: ()
   return (
     <Show when={text()}>
       <box
+        id={props.message.id}
         onMouseOver={() => {
           setHover(true)
         }}
