@@ -1,14 +1,12 @@
 import { TextAttributes } from "@opentui/core"
 import { Theme } from "../context/theme"
 import { useSDK } from "../context/sdk"
-import { createResource, For, Match, onMount, Switch } from "solid-js"
-import { useDialog } from "../ui/dialog"
+import { createResource, For, Match, Switch } from "solid-js"
 
 export type DialogStatusProps = {}
 
 export function DialogStatus() {
   const sdk = useSDK()
-  const dialog = useDialog()
 
   const [mcp] = createResource(async () => {
     const result = await sdk.mcp.status()

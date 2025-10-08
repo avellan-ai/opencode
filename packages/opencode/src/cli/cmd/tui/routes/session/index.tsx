@@ -57,6 +57,8 @@ export function Session() {
     if (dialog.stack.length > 0) return
     if (keybind.match("messages_page_up", evt)) scroll.scrollBy(-scroll.height / 2)
     if (keybind.match("messages_page_down", evt)) scroll.scrollBy(scroll.height / 2)
+    if (keybind.match("messages_first", evt)) scroll.scrollTo(0)
+    if (keybind.match("messages_last", evt)) scroll.scrollTo(scroll.scrollHeight)
 
     const first = permissions()[0]
     if (first) {
