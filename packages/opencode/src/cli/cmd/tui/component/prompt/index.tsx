@@ -124,10 +124,6 @@ export function Prompt(props: PromptProps) {
       ? props.sessionID
       : await (async () => {
           const sessionID = await sdk.session.create({}).then((x) => x.data!.id)
-          route.navigate({
-            type: "session",
-            sessionID,
-          })
           return sessionID
         })()
     const messageID = Identifier.ascending("message")
@@ -192,6 +188,15 @@ export function Prompt(props: PromptProps) {
       parts: [],
     })
     props.onSubmit?.()
+
+    // temporary hack to make sure the message is sent
+    if (!props.sessionID)
+      setTimeout(() => {
+        route.navigate({
+          type: "session",
+          sessionID,
+        })
+      }, 50)
   }
 
   return (

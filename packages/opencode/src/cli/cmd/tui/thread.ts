@@ -1,5 +1,7 @@
 import { cmd } from "@/cli/cmd/cmd"
 import { tui } from "./app"
+import { Rpc } from "@/util/rpc"
+import { type rpc } from "./worker"
 
 export const TuiThreadCommand = cmd({
   command: "$0 [project]",
@@ -24,18 +26,13 @@ export const TuiThreadCommand = cmd({
   handler: async () => {
     const worker = new Worker("./src/cli/cmd/tui/worker.ts")
     worker.onerror = console.error
-    const server = await new Promise<any>((resolve) => {
-      worker.onmessage = async (evt) => {
-        resolve(JSON.parse(evt.data))
-      }
-    })
+    const client = Rpc.client<typeof rpc>(worker)
+    const server = await client.call("server", undefined)
     await tui({
       url: server.url,
       onExit: async () => {
-        await new Promise((resolve) => {
-          worker.onmessage = resolve
-          worker.postMessage(JSON.stringify({ type: "shutdown" }))
-        })
+        await client.call("shutdown", undefined)
+        worker.terminate()
       },
     })
   },
