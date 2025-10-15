@@ -7,6 +7,13 @@ const port = import.meta.env.VITE_OPENCODE_SERVER_PORT ?? "4096"
 function init() {
   const client = createOpencodeClient({
     baseUrl: `http://${host}:${port}`,
+    fetch: (req) => {
+      return fetch({
+        ...req,
+        // @ts-ignore
+        timeout: false,
+      })
+    },
   })
   return client
 }
