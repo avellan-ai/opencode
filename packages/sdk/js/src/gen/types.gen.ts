@@ -1062,50 +1062,27 @@ export type EventTuiPromptAppend = {
   }
 }
 
-export type EventTuiPromptSubmit = {
-  type: "tui.prompt.submit"
-  properties: {
-    [key: string]: unknown
-  }
-}
-
-export type EventTuiPromptClear = {
-  type: "tui.prompt.clear"
-  properties: {
-    [key: string]: unknown
-  }
-}
-
 export type EventTuiCommandExecute = {
   type: "tui.command.execute"
   properties: {
-    command: "session.list"
-    [key: string]:
-      | {
-          command: string
-        }
-      | "session.list"
-  }
-}
-
-export type EventTuiSessionList = {
-  type: "tui.session.list"
-  properties: {
-    [key: string]: unknown
-  }
-}
-
-export type EventTuiThemeList = {
-  type: "tui.theme.list"
-  properties: {
-    [key: string]: unknown
-  }
-}
-
-export type EventTuiModelList = {
-  type: "tui.model.list"
-  properties: {
-    [key: string]: unknown
+    command:
+      | (
+          | "session.list"
+          | "session.new"
+          | "session.share"
+          | "session.interrupt"
+          | "session.compact"
+          | "session.page.up"
+          | "session.page.down"
+          | "session.half.page.up"
+          | "session.half.page.down"
+          | "session.first"
+          | "session.last"
+          | "prompt.clear"
+          | "prompt.submit"
+          | "agent.cycle"
+        )
+      | string
   }
 }
 
@@ -1306,12 +1283,7 @@ export type Event =
   | EventSessionDeleted
   | EventSessionError
   | EventTuiPromptAppend
-  | EventTuiPromptSubmit
-  | EventTuiPromptClear
   | EventTuiCommandExecute
-  | EventTuiSessionList
-  | EventTuiThemeList
-  | EventTuiModelList
   | EventTuiToastShow
   | EventServerConnected
 
@@ -1585,38 +1557,9 @@ export type SessionGetResponses = {
 export type SessionGetResponse = SessionGetResponses[keyof SessionGetResponses]
 
 export type SessionUpdateData = {
-  body?:
-    | {
-        text: string
-      }
-    | {
-        [key: string]: unknown
-      }
-    | {
-        [key: string]: unknown
-      }
-    | {
-        [key: string]: unknown
-      }
-    | {
-        [key: string]: unknown
-      }
-    | {
-        [key: string]: unknown
-      }
-    | {
-        command: "session.list"
-        [key: string]:
-          | {
-              command: string
-            }
-          | "session.list"
-      }
-    | {
-        title?: string
-        message: string
-        variant: "info" | "success" | "warning" | "error"
-      }
+  body?: {
+    title?: string
+  }
   path: {
     id: string
   }
@@ -2652,12 +2595,7 @@ export type TuiClearPromptResponse = TuiClearPromptResponses[keyof TuiClearPromp
 
 export type TuiExecuteCommandData = {
   body?: {
-    command: "session.list"
-    [key: string]:
-      | {
-          command: string
-        }
-      | "session.list"
+    command: string
   }
   path?: never
   query?: {
@@ -2707,15 +2645,7 @@ export type TuiShowToastResponses = {
 export type TuiShowToastResponse = TuiShowToastResponses[keyof TuiShowToastResponses]
 
 export type TuiPublishData = {
-  body?:
-    | EventTuiPromptAppend
-    | EventTuiPromptSubmit
-    | EventTuiPromptClear
-    | EventTuiCommandExecute
-    | EventTuiSessionList
-    | EventTuiThemeList
-    | EventTuiModelList
-    | EventTuiToastShow
+  body?: EventTuiPromptAppend | EventTuiCommandExecute | EventTuiToastShow
   path?: never
   query?: {
     directory?: string

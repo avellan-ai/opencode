@@ -77,7 +77,6 @@ export function Prompt(props: PromptProps) {
         title: "Clear prompt",
         value: "prompt.clear",
         disabled: true,
-        keybind: "input_clear",
         category: "Prompt",
         onSelect: (dialog) => {
           setStore("prompt", {
