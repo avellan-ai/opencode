@@ -1289,6 +1289,11 @@ export namespace SessionPrompt {
                 })
                 continue
             }
+            
+            // If permission was rejected and blocked, break out of processing loop
+            if (blocked) {
+              break
+            }
           }
         } catch (e) {
           log.error("process", {
