@@ -59,9 +59,8 @@ export namespace Log {
     cleanup(Global.Path.log)
     if (options.print) return
     logpath = path.join(
-      "dev.log",
-      // Global.Path.log,
-      // options.dev ? "dev.log" : new Date().toISOString().split(".")[0].replace(/:/g, "") + ".log",
+      Global.Path.log,
+      options.dev ? "dev.log" : new Date().toISOString().split(".")[0].replace(/:/g, "") + ".log",
     )
     const logfile = Bun.file(logpath)
     await fs.truncate(logpath).catch(() => {})
