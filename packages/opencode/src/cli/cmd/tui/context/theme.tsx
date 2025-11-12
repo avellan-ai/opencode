@@ -1,5 +1,5 @@
 import { SyntaxStyle, RGBA, type TerminalColors } from "@opentui/core"
-import { createMemo } from "solid-js"
+import { createMemo, onMount } from "solid-js"
 import { useSync } from "@tui/context/sync"
 import { createSimpleContext } from "./helper"
 import aura from "./theme/aura.json" with { type: "json" }
@@ -144,6 +144,7 @@ export const { use: useTheme, provider: ThemeProvider } = createSimpleContext({
       themes: DEFAULT_THEMES,
       mode: props.mode,
       active: (sync.data.config.theme ?? kv.get("theme", "opencode")) as string,
+      ready: false,
     })
 
     const renderer = useRenderer()
@@ -187,7 +188,7 @@ export const { use: useTheme, provider: ThemeProvider } = createSimpleContext({
         kv.set("theme", theme)
       },
       get ready() {
-        return sync.ready
+        return store.ready
       },
     }
   },
