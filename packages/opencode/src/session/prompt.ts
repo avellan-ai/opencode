@@ -242,6 +242,7 @@ export namespace SessionPrompt {
 
     let step = 0
     while (true) {
+      SessionStatus.set(sessionID, { type: "busy" })
       log.info("loop", { step, sessionID })
       if (abort.aborted) break
       let msgs = await MessageV2.filterCompacted(MessageV2.stream(sessionID))

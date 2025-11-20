@@ -1,5 +1,5 @@
 import { BoxRenderable, TextareaRenderable, MouseEvent, PasteEvent, t, dim, fg, type KeyBinding } from "@opentui/core"
-import { createEffect, createMemo, type JSX, onMount, createSignal, onCleanup, Show } from "solid-js"
+import { createEffect, createMemo, type JSX, onMount, createSignal, onCleanup, Show, Switch, Match } from "solid-js"
 import { useLocal } from "@tui/context/local"
 import { useTheme } from "@tui/context/theme"
 import { EmptyBorder } from "@tui/component/border"
@@ -217,9 +217,14 @@ export function Prompt(props: PromptProps) {
         disabled: status().type === "idle",
         category: "Session",
         onSelect: (dialog) => {
-          if (!props.sessionID) return
           if (autocomplete.visible) return
           if (!input.focused) return
+          // TODO: this should be its own command
+          if (store.mode === "shell") {
+            setStore("mode", "normal")
+            return
+          }
+          if (!props.sessionID) return
 
           setStore("interrupt", store.interrupt + 1)
 
@@ -794,45 +799,50 @@ export function Prompt(props: PromptProps) {
         </box>
         <box flexDirection="row" justifyContent="space-between">
           <Show when={status().type !== "idle"} fallback={<text />}>
-            <box flexDirection="row" gap={1}>
-              <box flexDirection="row" gap={1} flexShrink={0}>
-                {(() => {
-                  const retry = createMemo(() => {
-                    const s = status()
-                    if (s.type !== "retry") return
-                    return s
-                  })
-                  const message = createMemo(() => {
-                    const r = retry()
-                    if (!r) return
-                    if (r.message.includes("exceeded your current quota") && r.message.includes("gemini"))
-                      return "gemini 3 way too hot right now"
-                    if (r.message.length > 50) return r.message.slice(0, 50) + "..."
-                    return r.message
-                  })
-                  const [seconds, setSeconds] = createSignal(0)
-                  onMount(() => {
-                    const timer = setInterval(() => {
-                      const next = retry()?.next
-                      if (next) setSeconds(Math.round((next - Date.now()) / 1000))
-                    }, 1000)
-
-                    onCleanup(() => {
-                      clearInterval(timer)
+            <box
+              flexDirection="row"
+              gap={1}
+              flexGrow={1}
+              justifyContent={status().type === "retry" ? "space-between" : "flex-start"}
+            >
+              <box flexShrink={0} flexDirection="row" gap={1}>
+                <Shimmer text="Working" color={theme.text} />
+                <box flexDirection="row" gap={1} flexShrink={0}>
+                  {(() => {
+                    const retry = createMemo(() => {
+                      const s = status()
+                      if (s.type !== "retry") return
+                      return s
                     })
-                  })
-                  return (
-                    <Show when={retry()}>
-                      <text fg={theme.error}>
-                        {message()} [retrying {seconds() > 0 ? `in ${seconds()}s ` : ""}
-                        attempt #{retry()!.attempt}]
-                      </text>
-                    </Show>
-                  )
-                })()}
-              </box>
-              <box flexShrink={0}>
-                <Shimmer text="x Working" color={theme.text} />
+                    const message = createMemo(() => {
+                      const r = retry()
+                      if (!r) return
+                      if (r.message.includes("exceeded your current quota") && r.message.includes("gemini"))
+                        return "gemini 3 way too hot right now"
+                      if (r.message.length > 50) return r.message.slice(0, 50) + "..."
+                      return r.message
+                    })
+                    const [seconds, setSeconds] = createSignal(0)
+                    onMount(() => {
+                      const timer = setInterval(() => {
+                        const next = retry()?.next
+                        if (next) setSeconds(Math.round((next - Date.now()) / 1000))
+                      }, 1000)
+
+                      onCleanup(() => {
+                        clearInterval(timer)
+                      })
+                    })
+                    return (
+                      <Show when={retry()}>
+                        <text fg={theme.error}>
+                          {message()} [retrying {seconds() > 0 ? `in ${seconds()}s ` : ""}
+                          attempt #{retry()!.attempt}]
+                        </text>
+                      </Show>
+                    )
+                  })()}
+                </box>
               </box>
               <text fg={store.interrupt > 0 ? theme.primary : theme.text}>
                 esc{" "}
@@ -844,12 +854,21 @@ export function Prompt(props: PromptProps) {
           </Show>
           <Show when={status().type !== "retry"}>
             <box gap={2} flexDirection="row">
-              <text fg={theme.text}>
-                {keybind.print("agent_cycle")} <span style={{ fg: theme.textMuted }}>switch agent</span>
-              </text>
-              <text fg={theme.text}>
-                {keybind.print("command_list")} <span style={{ fg: theme.textMuted }}>commands</span>
-              </text>
+              <Switch>
+                <Match when={store.mode === "normal"}>
+                  <text fg={theme.text}>
+                    {keybind.print("agent_cycle")} <span style={{ fg: theme.textMuted }}>switch agent</span>
+                  </text>
+                  <text fg={theme.text}>
+                    {keybind.print("command_list")} <span style={{ fg: theme.textMuted }}>commands</span>
+                  </text>
+                </Match>
+                <Match when={store.mode === "shell"}>
+                  <text fg={theme.text}>
+                    esc <span style={{ fg: theme.textMuted }}>exit shell mode</span>
+                  </text>
+                </Match>
+              </Switch>
             </box>
           </Show>
         </box>
