@@ -51,23 +51,23 @@ export function SessionTimeline(props: { sessionID: string; expanded?: boolean }
   return (
     <div data-component="session-timeline">
       <Show when={userMessages().length > 1}>
-        <ul role="list" data-slot="timeline-list" data-expanded={props.expanded}>
+        <ul role="list" data-slot="session-timeline-timeline-list" data-expanded={props.expanded}>
           <For each={userMessages()}>
             {(message) => {
               const messageWorking = createMemo(() => message.id === lastUserMessage()?.id && working())
               const handleClick = () => setStore("messageId", message.id)
 
               return (
-                <li data-slot="timeline-item" data-expanded={props.expanded}>
+                <li data-slot="session-timeline-timeline-item" data-expanded={props.expanded}>
                   <button
-                    data-slot="tick-button"
+                    data-slot="session-timeline-tick-button"
                     data-active={activeMessage()?.id === message.id}
                     data-expanded={props.expanded}
                     onClick={handleClick}
                   >
-                    <div data-slot="tick-line" />
+                    <div data-slot="session-timeline-tick-line" />
                   </button>
-                  <button data-slot="message-button" data-expanded={props.expanded} onClick={handleClick}>
+                  <button data-slot="session-timeline-message-button" data-expanded={props.expanded} onClick={handleClick}>
                     <Switch>
                       <Match when={messageWorking()}>
                         <Spinner class="spinner" />
@@ -76,7 +76,7 @@ export function SessionTimeline(props: { sessionID: string; expanded?: boolean }
                         <DiffChanges changes={message.summary?.diffs ?? []} variant="bars" />
                       </Match>
                     </Switch>
-                    <div data-slot="message-title-preview" data-active={activeMessage()?.id === message.id}>
+                    <div data-slot="session-timeline-message-title-preview" data-active={activeMessage()?.id === message.id}>
                       <Show when={message.summary?.title} fallback="New message">
                         {message.summary?.title}
                       </Show>
@@ -88,7 +88,7 @@ export function SessionTimeline(props: { sessionID: string; expanded?: boolean }
           </For>
         </ul>
       </Show>
-      <div data-slot="content">
+      <div data-slot="session-timeline-content">
         <For each={userMessages()}>
           {(message) => {
             const isActive = createMemo(() => activeMessage()?.id === message.id)
@@ -129,10 +129,10 @@ export function SessionTimeline(props: { sessionID: string; expanded?: boolean }
 
             return (
               <Show when={isActive()}>
-                <div data-message={message.id} data-slot="message-container">
+                <div data-message={message.id} data-slot="session-timeline-message-container">
                   {/* Title */}
-                  <div data-slot="message-header">
-                    <div data-slot="message-title">
+                  <div data-slot="session-timeline-message-header">
+                    <div data-slot="session-timeline-message-title">
                       <Show
                         when={titled()}
                         fallback={
@@ -150,9 +150,9 @@ export function SessionTimeline(props: { sessionID: string; expanded?: boolean }
                   <Message message={message} parts={parts()} />
                   {/* Summary */}
                   <Show when={completed()}>
-                    <div data-slot="summary-section">
-                      <div data-slot="summary-header">
-                        <h2 data-slot="summary-title">
+                    <div data-slot="session-timeline-summary-section">
+                      <div data-slot="session-timeline-summary-header">
+                        <h2 data-slot="session-timeline-summary-title">
                           <Switch>
                             <Match when={message.summary?.diffs?.length}>Summary</Match>
                             <Match when={true}>Response</Match>
@@ -161,7 +161,7 @@ export function SessionTimeline(props: { sessionID: string; expanded?: boolean }
                         <Show when={message.summary?.body}>
                           {(summary) => (
                             <Markdown
-                              data-slot="markdown"
+                              data-slot="session-timeline-markdown"
                               data-diffs={!!message.summary?.diffs?.length}
                               data-fade={!message.summary?.diffs?.length && !contentSeen()}
                               text={summary()}
@@ -169,30 +169,30 @@ export function SessionTimeline(props: { sessionID: string; expanded?: boolean }
                           )}
                         </Show>
                       </div>
-                      <Accordion data-slot="accordion" multiple>
+                      <Accordion data-slot="session-timeline-accordion" multiple>
                         <For each={message.summary?.diffs ?? []}>
                           {(diff) => (
                             <Accordion.Item value={diff.file}>
-                              <StickyAccordionHeader data-slot="sticky-header">
+                              <StickyAccordionHeader data-slot="session-timeline-sticky-header">
                                 <Accordion.Trigger>
-                                  <div data-slot="accordion-trigger-content">
-                                    <div data-slot="file-info">
-                                      <FileIcon node={{ path: diff.file, type: "file" }} data-slot="file-icon" />
-                                      <div data-slot="file-path">
+                                  <div data-slot="session-timeline-accordion-trigger-content">
+                                    <div data-slot="session-timeline-file-info">
+                                      <FileIcon node={{ path: diff.file, type: "file" }} data-slot="session-timeline-file-icon" />
+                                      <div data-slot="session-timeline-file-path">
                                         <Show when={diff.file.includes("/")}>
-                                          <span data-slot="directory">{getDirectory(diff.file)}&lrm;</span>
+                                          <span data-slot="session-timeline-directory">{getDirectory(diff.file)}&lrm;</span>
                                         </Show>
-                                        <span data-slot="filename">{getFilename(diff.file)}</span>
+                                        <span data-slot="session-timeline-filename">{getFilename(diff.file)}</span>
                                       </div>
                                     </div>
-                                    <div data-slot="accordion-actions">
+                                    <div data-slot="session-timeline-accordion-actions">
                                       <DiffChanges changes={diff} />
                                       <Icon name="chevron-grabber-vertical" size="small" />
                                     </div>
                                   </div>
                                 </Accordion.Trigger>
                               </StickyAccordionHeader>
-                              <Accordion.Content data-slot="accordion-content">
+                              <Accordion.Content data-slot="session-timeline-accordion-content">
                                 <Diff
                                   before={{
                                     name: diff.file!,
@@ -216,16 +216,16 @@ export function SessionTimeline(props: { sessionID: string; expanded?: boolean }
                     </Card>
                   </Show>
                   {/* Response */}
-                  <div data-slot="response-section">
+                  <div data-slot="session-timeline-response-section">
                     <Switch>
                       <Match when={!completed()}>
                         <MessageProgress assistantMessages={assistantMessages} done={!messageWorking()} />
                       </Match>
                       <Match when={completed() && hasToolPart()}>
                         <Collapsible variant="ghost" open={detailsExpanded()} onOpenChange={setDetailsExpanded}>
-                          <Collapsible.Trigger data-slot="collapsible-trigger">
-                            <div data-slot="collapsible-trigger-content">
-                              <div data-slot="details-text">
+                          <Collapsible.Trigger data-slot="session-timeline-collapsible-trigger">
+                            <div data-slot="session-timeline-collapsible-trigger-content">
+                              <div data-slot="session-timeline-details-text">
                                 <Switch>
                                   <Match when={detailsExpanded()}>Hide details</Match>
                                   <Match when={!detailsExpanded()}>Show details</Match>
@@ -235,7 +235,7 @@ export function SessionTimeline(props: { sessionID: string; expanded?: boolean }
                             </div>
                           </Collapsible.Trigger>
                           <Collapsible.Content>
-                            <div data-slot="collapsible-content-inner">
+                            <div data-slot="session-timeline-collapsible-content-inner">
                               <For each={assistantMessages()}>
                                 {(assistantMessage) => {
                                   const parts = createMemo(() => data.part[assistantMessage.id])
