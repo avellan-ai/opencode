@@ -91,7 +91,7 @@ export function Header() {
       <box
         height={1}
         border={["bottom"]}
-        borderColor={theme.backgroundElement}
+        borderColor={theme.backgroundPanel}
         customBorderChars={
           theme.background.a != 0
             ? {
@@ -108,9 +108,9 @@ export function Header() {
         paddingLeft={2}
         paddingRight={1}
         {...SplitBorder}
-        borderColor={theme.backgroundElement}
+        borderColor={theme.backgroundPanel}
         flexShrink={0}
-        backgroundColor={theme.backgroundElement}
+        backgroundColor={theme.backgroundPanel}
       >
         <Show
           when={shareEnabled()}
@@ -144,7 +144,7 @@ export function Header() {
       <box
         height={1}
         border={["bottom"]}
-        borderColor={theme.backgroundElement}
+        borderColor={theme.backgroundPanel}
         customBorderChars={
           theme.background.a != 0
             ? {
