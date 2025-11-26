@@ -239,7 +239,7 @@ export function Sidebar(props: { sessionID: string }) {
         </scrollbox>
 
         <box flexShrink={0} gap={1}>
-          <Show when={hasProviders()}>
+          <Show when={!hasProviders()}>
             <box
               backgroundColor={theme.backgroundElement}
               paddingTop={1}
