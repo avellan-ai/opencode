@@ -14,7 +14,7 @@
   "mcp": {
     "exa": {
       "type": "remote",
-      "url": "https://mcp.exa.ai/mcps",
+      "url": "https://mcp.exa.ai/mcp",
     },
   },
 }
