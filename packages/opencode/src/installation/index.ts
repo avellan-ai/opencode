@@ -4,6 +4,7 @@ import z from "zod"
 import { NamedError } from "@opencode-ai/util/error"
 import { Bus } from "../bus"
 import { Log } from "../util/log"
+import { iife } from "@/util/iife"
 
 declare global {
   const OPENCODE_VERSION: string
@@ -162,20 +163,19 @@ export namespace Installation {
   export const CHANNEL = typeof OPENCODE_CHANNEL === "string" ? OPENCODE_CHANNEL : "local"
   export const USER_AGENT = `opencode/${CHANNEL}/${VERSION}`
 
-  async function getRegistryUrl() {
-    const result = await $`npm config get registry`.throws(false).text()
-    const registry = result.trim()
-    return registry || "https://registry.npmjs.org"
-  }
-
   export async function latest() {
+    const registry = await iife(async () => {
+      const r = (await $`npm config get registry`.throws(false).text()).trim()
+      const reg = r || "https://registry.npmjs.org"
+      return reg.endsWith("/") ? reg.slice(0, -1) : reg
+    })
     const [major] = VERSION.split(".").map((x) => Number(x))
     const channel = CHANNEL === "latest" ? `latest-${major}` : CHANNEL
-    const registry = await getRegistryUrl()
-    const registryUrl = registry.endsWith("/") ? registry.slice(0, -1) : registry
-    const res = await fetch(`${registryUrl}/opencode-ai/${channel}`)
-    if (!res.ok) throw new Error(res.statusText)
-    const data = await res.json()
-    return data.version
+    return fetch(`${registry}/opencode-ai/${channel}`)
+      .then((res) => {
+        if (!res.ok) throw new Error(res.statusText)
+        return res.json()
+      })
+      .then((data: any) => data.version)
   }
 }
