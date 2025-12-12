@@ -38,6 +38,7 @@ export namespace LLM {
       .tag("modelID", input.model.id)
       .tag("sessionID", input.sessionID)
       .tag("small", (input.small ?? false).toString())
+      .tag("agent", input.agent.name)
     l.info("stream", {
       modelID: input.model.id,
       providerID: input.model.providerID,
@@ -46,11 +47,11 @@ export namespace LLM {
 
     const [first, ...rest] = [
       ...SystemPrompt.header(input.model.providerID),
-      ...(input.agent.prompt ?? SystemPrompt.provider(input.model)),
+      ...(input.agent.prompt ? [input.agent.prompt] : SystemPrompt.provider(input.model)),
       ...input.system,
       ...(input.user.system ? [input.user.system] : []),
     ]
-    const system = [first, rest.join("\n")]
+    const system = [first, rest.join("\n")].filter((x) => x)
 
     const params = await Plugin.trigger(
       "chat.params",
