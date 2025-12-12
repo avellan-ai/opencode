@@ -1252,7 +1252,9 @@ export namespace SessionPrompt {
     }
     await Session.updatePart(part)
     const shell = Shell.preferred()
-    const shellName = path.basename(shell).toLowerCase()
+    const shellName = (
+      process.platform === "win32" ? path.win32.basename(shell, ".exe") : path.basename(shell)
+    ).toLowerCase()
 
     const invocations: Record<string, { args: string[] }> = {
       nu: {
@@ -1282,12 +1284,12 @@ export namespace SessionPrompt {
           `,
         ],
       },
-      // Windows cmd.exe
-      "cmd.exe": {
+      // Windows cmd
+      cmd: {
         args: ["/c", input.command],
       },
       // Windows PowerShell
-      "powershell.exe": {
+      powershell: {
         args: ["-NoProfile", "-Command", input.command],
       },
       pwsh: {
