@@ -8,15 +8,7 @@ import { Faq } from "~/component/faq"
 import desktopAppIcon from "../../asset/lander/opencode-desktop-icon.png"
 import { Legal } from "~/component/legal"
 import { config } from "~/config"
-import { createMemo } from "solid-js"
-
-const getLatestRelease = query(async () => {
-  "use server"
-  const response = await fetch("https://api.github.com/repos/sst/opencode/releases/latest")
-  if (!response.ok) return null
-  const data = await response.json()
-  return data.tag_name as string
-}, "latest-release")
+import { github } from "~/lib/github"
 
 function CopyStatus() {
   return (
@@ -28,14 +20,14 @@ function CopyStatus() {
 }
 
 export default function Download() {
-  const release = createAsync(() => getLatestRelease(), {
+  const githubData = createAsync(() => github(), {
     deferStream: true,
   })
-  const download = createMemo(() => {
-    const version = release() ?? "v1.0.150"
+  const download = () => {
+    const version = githubData()?.release.tag_name
     if (!version) return null
     return `https://github.com/sst/opencode/releases/download/${version}`
-  })
+  }
   const handleCopyClick = (command: string) => (event: Event) => {
     const button = event.currentTarget as HTMLButtonElement
     navigator.clipboard.writeText(command)
