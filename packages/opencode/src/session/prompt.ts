@@ -1322,7 +1322,6 @@ export namespace SessionPrompt {
       input.history.filter((m) => m.info.role === "user" && !m.parts.every((p) => "synthetic" in p && p.synthetic))
         .length === 1
     if (!isFirst) return
-<<<<<<< HEAD
     const agent = await Agent.get("summary")
     if (!agent) return
     const result = await LLM.stream({
@@ -1340,23 +1339,6 @@ export namespace SessionPrompt {
       abort: new AbortController().signal,
       sessionID: input.session.id,
       retries: 2,
-=======
-    const cfg = await Config.get()
-    const small =
-      (await Provider.getSmallModel(input.providerID)) ?? (await Provider.getModel(input.providerID, input.modelID))
-    const language = await Provider.getLanguage(small)
-    const provider = await Provider.getProvider(small.providerID)
-    const options = pipe(
-      {},
-      mergeDeep(ProviderTransform.options(small, input.session.id, provider?.options)),
-      mergeDeep(ProviderTransform.smallOptions(small)),
-      mergeDeep(small.options),
-    )
-    await generateText({
-      // use higher # for reasoning models since reasoning tokens eat up a lot of the budget
-      maxOutputTokens: small.capabilities.reasoning ? 3000 : 20,
-      providerOptions: ProviderTransform.providerOptions(small, options),
->>>>>>> dev
       messages: [
         {
           role: "user",
