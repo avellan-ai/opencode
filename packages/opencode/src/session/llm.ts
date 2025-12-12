@@ -109,7 +109,7 @@ export namespace LLM {
       },
       temperature: params.temperature,
       topP: params.topP,
-      providerOptions: ProviderTransform.providerOptions(input.model, params.options, input.messages),
+      providerOptions: ProviderTransform.providerOptions(input.model, params.options),
       activeTools: Object.keys(input.tools).filter((x) => x !== "invalid"),
       tools: input.tools,
       maxOutputTokens,
