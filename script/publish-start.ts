@@ -54,9 +54,6 @@ await import(`../packages/sdk/js/script/publish.ts`)
 console.log("\n=== plugin ===\n")
 await import(`../packages/plugin/script/publish.ts`)
 
-const dir = new URL("..", import.meta.url).pathname
-process.chdir(dir)
-
 if (!Script.preview) {
   await $`git commit -am "release: v${Script.version}"`
   await $`git tag v${Script.version}`
@@ -70,3 +67,6 @@ if (!Script.preview) {
     await Bun.write(process.env.GITHUB_OUTPUT, `releaseId=${release.id}\ntagName=${release.tagName}\n`)
   }
 }
+
+const dir = new URL("..", import.meta.url).pathname
+process.chdir(dir)
