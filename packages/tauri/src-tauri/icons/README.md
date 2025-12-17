@@ -1,6 +1,7 @@
 # Tauri Icons
 
 Here's the process I've been using to create icons:
+
 - Save source image as `app-icon.png` in `packages/tauri`
 - `cd` to `src-tauri`
 - Run `bun tauri icons -o icons/{environment}`
