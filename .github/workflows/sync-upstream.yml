@@ -1,0 +1,66 @@
+name: Sync with upstream releases
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Fetch upstream tags
+        run: |
+          git remote add upstream https://github.com/sst/opencode.git || true
+          git fetch upstream --tags --force
+
+      - name: Get latest upstream release
+        id: release
+        run: |
+          LATEST=$(git tag -l | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -1)
+          CURRENT=$(git describe --tags --abbrev=0 origin/feat/compaction-threshold 2>/dev/null || echo "none")
+          echo "latest=$LATEST" >> $GITHUB_OUTPUT
+          echo "current=$CURRENT" >> $GITHUB_OUTPUT
+          echo "Latest upstream: $LATEST, Current base: $CURRENT"
+
+      - name: Rebase on new release
+        if: steps.release.outputs.latest != steps.release.outputs.current
+        run: |
+          git checkout feat/compaction-threshold
+          git rebase ${{ steps.release.outputs.latest }} || {
+            echo "::warning::Rebase conflict - manual intervention needed"
+            git rebase --abort
+            exit 1
+          }
+          git push --force-with-lease origin feat/compaction-threshold
+
+      - name: Update main branch
+        if: steps.release.outputs.latest != steps.release.outputs.current
+        run: |
+          git checkout main
+          git reset --hard ${{ steps.release.outputs.latest }}
+          git push --force origin main
+
+      - name: Create release notification
+        if: steps.release.outputs.latest != steps.release.outputs.current
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "fork-${{ steps.release.outputs.latest }}" \
+            --title "Fork synced to ${{ steps.release.outputs.latest }}" \
+            --notes "Rebased feat/compaction-threshold on upstream ${{ steps.release.outputs.latest }}" \
+            --target feat/compaction-threshold || true

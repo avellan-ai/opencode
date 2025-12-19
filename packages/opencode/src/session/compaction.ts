@@ -34,7 +34,9 @@ export namespace SessionCompaction {
     const count = input.tokens.input + input.tokens.cache.read + input.tokens.output
     const output = Math.min(input.model.limit.output, SessionPrompt.OUTPUT_TOKEN_MAX) || SessionPrompt.OUTPUT_TOKEN_MAX
     const usable = context - output
-    return count > usable
+    // Apply threshold - default 1.0 (current behavior), 0.8 = trigger at 80%
+    const threshold = Flag.OPENCODE_COMPACTION_THRESHOLD ?? 1.0
+    return count > usable * threshold
   }
 
   export const PRUNE_MINIMUM = 20_000

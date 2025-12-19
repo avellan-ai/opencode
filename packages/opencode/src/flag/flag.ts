@@ -28,6 +28,12 @@ export namespace Flag {
   export const OPENCODE_EXPERIMENTAL_BASH_MAX_OUTPUT_LENGTH = number("OPENCODE_EXPERIMENTAL_BASH_MAX_OUTPUT_LENGTH")
   export const OPENCODE_EXPERIMENTAL_BASH_DEFAULT_TIMEOUT_MS = number("OPENCODE_EXPERIMENTAL_BASH_DEFAULT_TIMEOUT_MS")
   export const OPENCODE_EXPERIMENTAL_OUTPUT_TOKEN_MAX = number("OPENCODE_EXPERIMENTAL_OUTPUT_TOKEN_MAX")
+  export const OPENCODE_COMPACTION_THRESHOLD = (() => {
+    const value = process.env["OPENCODE_COMPACTION_THRESHOLD"]
+    if (!value) return undefined
+    const parsed = Number.parseFloat(value)
+    return !Number.isNaN(parsed) && parsed >= 0.5 && parsed <= 1.0 ? parsed : undefined
+  })()
   export const OPENCODE_EXPERIMENTAL_OXFMT = OPENCODE_EXPERIMENTAL || truthy("OPENCODE_EXPERIMENTAL_OXFMT")
   export const OPENCODE_EXPERIMENTAL_LSP_TY = truthy("OPENCODE_EXPERIMENTAL_LSP_TY")
 
