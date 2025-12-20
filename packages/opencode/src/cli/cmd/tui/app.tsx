@@ -1,6 +1,11 @@
-import { render, useKeyboard, useRenderer, useTerminalDimensions } from "@opentui/solid"
+import { render, useKeyboard, useRenderer, useTerminalDimensions, extend } from "@opentui/solid"
+import { SpinnerRenderable } from "opentui-spinner"
 import { Clipboard } from "@tui/util/clipboard"
 import { TextAttributes } from "@opentui/core"
+
+// Register spinner component manually to avoid module resolution issues
+// where opentui-spinner/solid's extend() call modifies a different @opentui/solid instance
+extend({ spinner: SpinnerRenderable })
 import { RouteProvider, useRoute } from "@tui/context/route"
 import { Switch, Match, createEffect, untrack, ErrorBoundary, createSignal, onMount, batch, Show, on } from "solid-js"
 import { Installation } from "@/installation"
