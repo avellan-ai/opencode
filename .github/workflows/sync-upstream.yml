@@ -1,0 +1,87 @@
+name: Sync with upstream releases
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dev
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Fetch upstream
+        run: |
+          git remote add upstream https://github.com/sst/opencode.git || true
+          git fetch upstream --tags --force
+
+      - name: Get version info
+        id: version
+        run: |
+          # Get latest upstream release tag
+          LATEST_TAG=$(git tag -l | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -1)
+
+          # Get current upstream version from package.json
+          CURRENT_VERSION=$(jq -r '.version' packages/opencode/package.json)
+          LATEST_VERSION=${LATEST_TAG#v}
+
+          echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
+          echo "latest_version=$LATEST_VERSION" >> $GITHUB_OUTPUT
+          echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          echo "Latest upstream: $LATEST_VERSION, Current: $CURRENT_VERSION"
+
+      - name: Rebase dev on new release
+        if: steps.version.outputs.latest_version != steps.version.outputs.current_version
+        run: |
+          echo "Rebasing dev branch on ${{ steps.version.outputs.latest_tag }}..."
+
+          # Rebase dev branch on the new upstream release
+          git rebase ${{ steps.version.outputs.latest_tag }} || {
+            echo "::error::Rebase conflict - manual intervention needed"
+            git rebase --abort
+            exit 1
+          }
+
+          # Force push the rebased branch
+          git push --force-with-lease origin dev
+
+      - name: Update main to match dev
+        if: steps.version.outputs.latest_version != steps.version.outputs.current_version
+        run: |
+          git checkout main
+          git reset --hard dev
+          git push --force origin main
+
+      - name: Create sync notification
+        if: steps.version.outputs.latest_version != steps.version.outputs.current_version
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Read fork version
+          FORK_VERSION=$(jq -r '.version' fork-version.json)
+          FORK_NAME=$(jq -r '.name' fork-version.json)
+          FULL_VERSION="${{ steps.version.outputs.latest_version }}+${FORK_NAME}.${FORK_VERSION}"
+
+          gh release create "v${FULL_VERSION}" \
+            --title "Synced to upstream ${{ steps.version.outputs.latest_tag }}" \
+            --notes "Fork rebased on upstream ${{ steps.version.outputs.latest_tag }}
+
+Version: \`${FULL_VERSION}\`
+
+## Changes from upstream
+See [upstream release notes](https://github.com/sst/opencode/releases/tag/${{ steps.version.outputs.latest_tag }})" \
+            --target main || echo "Release already exists or failed to create"
