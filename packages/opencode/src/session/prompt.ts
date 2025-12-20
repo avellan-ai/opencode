@@ -43,6 +43,7 @@ import { SessionStatus } from "./status"
 import { LLM } from "./llm"
 import { iife } from "@/util/iife"
 import { Shell } from "@/shell/shell"
+import { ToolResult } from "@/util/tool-result"
 
 // @ts-ignore
 globalThis.AI_SDK_LOG_WARNINGS = false
@@ -695,10 +696,45 @@ export namespace SessionPrompt {
           // Add support for other types if needed
         }
 
+        const output = textParts.join("\n\n")
+
+        // Check if output exceeds threshold and persist to file if so
+        const maxChars = Flag.OPENCODE_TOOL_RESULT_MAX_CHARS ?? 100_000
+        if (output.length > maxChars) {
+          const isJson = result.content.some(
+            (c: any) => c.type === "text" && c.text?.trim().startsWith("{"),
+          )
+
+          const filepath = await ToolResult.persist({
+            sessionID: input.sessionID,
+            tool: key,
+            callID: opts.toolCallId,
+            content: output,
+            mimeType: isJson ? "application/json" : "text/plain",
+          })
+
+          return {
+            title: `Output persisted (${output.length.toLocaleString()} chars)`,
+            metadata: {
+              ...result.metadata,
+              persisted: true,
+              filepath,
+              originalLength: output.length,
+            },
+            output: ToolResult.formatReference({
+              filepath,
+              charCount: output.length,
+              tool: key,
+              isJson,
+            }),
+            attachments,
+          }
+        }
+
         return {
           title: "",
           metadata: result.metadata ?? {},
-          output: textParts.join("\n\n"),
+          output,
           attachments,
           content: result.content, // directly return content to preserve ordering when outputting to model
         }
