@@ -4,7 +4,8 @@
  *
  * Usage:
  *   bun run script/install-local.ts
- *   bun run script/install-local.ts --bump  # Increment fork version before building
+ *   bun run script/install-local.ts --bump      # Increment fork version before building
+ *   bun run script/install-local.ts --no-pull   # Skip git pull
  *
  * Installs to ~/.local/bin/opencode (or creates it if it doesn't exist)
  */
@@ -19,9 +20,17 @@ const forkVersionPath = path.join(rootDir, "fork-version.json")
 const installDir = path.join(os.homedir(), ".local", "bin")
 
 const shouldBump = process.argv.includes("--bump")
+const skipPull = process.argv.includes("--no-pull")
 
 // Ensure install directory exists
 await fs.mkdir(installDir, { recursive: true })
+
+// Pull latest changes
+if (!skipPull) {
+  console.log("Pulling latest changes...")
+  process.chdir(rootDir)
+  await $`git pull --rebase`
+}
 
 // Optionally bump fork version
 if (shouldBump) {

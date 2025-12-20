@@ -36,17 +36,24 @@ export OPENCODE_COMPACTION_THRESHOLD=0.7  # Compact at 70% capacity (default: ~8
 
 ## Building & Installing
 
-### Install locally
+### Quick install (most common)
 ```bash
 bun run install-local
 ```
-Builds for your platform and installs to `~/.local/bin/opencode`.
+Pulls latest changes, builds for your platform, installs to `~/.local/bin/opencode`.
 
-### Install with version bump
+### Options
 ```bash
-bun run install-local:bump
+bun run install-local              # Pull + build + install
+bun run install-local:bump         # Pull + bump fork version + build + install
+bun run install-local -- --no-pull # Build without pulling (use current state)
 ```
-Increments the fork version in `fork-version.json`, then builds and installs.
+
+### What it does
+1. `git pull --rebase` (unless `--no-pull`)
+2. Bumps `fork-version.json` (if `--bump`)
+3. Builds binary for your platform
+4. Copies to `~/.local/bin/opencode`
 
 ### Manual build
 ```bash
