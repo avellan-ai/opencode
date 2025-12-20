@@ -9,6 +9,8 @@
     "dev": "bun run --cwd packages/opencode --conditions=browser src/index.ts",
     "typecheck": "bun turbo typecheck",
     "prepare": "husky",
+    "install-local": "bun run script/install-local.ts",
+    "install-local:bump": "bun run script/install-local.ts --bump",
     "random": "echo 'Random script'",
     "hello": "echo 'Hello World!'"
   },
